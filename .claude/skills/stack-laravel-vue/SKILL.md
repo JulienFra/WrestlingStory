@@ -72,6 +72,7 @@ Ce skill décrit la stack de WrestlingStory et la façon dont le groupe veut qu'
 - **`composer setup` s'arrête sur « exceeded the timeout of 300 seconds »** : premier `composer install` lent sous Windows. Relancer avec `COMPOSER_PROCESS_TIMEOUT=0`, ou finir les étapes à la main (`php artisan key:generate`, `php artisan migrate`, `npm install`, `npm run build`).
 - **`npm run build` dit « 'php' n'est pas reconnu »** : Wayfinder appelle `php` ; le terminal a été ouvert avant l'installation de PHP. Rouvrir le terminal.
 - **Changer `DB_PASSWORD` ne change pas le mot de passe de la base Docker** : il n'est lu qu'à la création du volume, comme `init.sql`. Pour repartir de zéro (données perdues) : `docker compose down -v`, puis `docker compose up -d`.
+- **La CI échoue sur `npm ci` (« package.json and package-lock.json … in sync »)** : le lock commité n'est plus à jour. Lancer `npm install`, vérifier le diff du lock et le commiter ; ne pas annuler ce diff en le prenant pour du bruit.
 - **`php` ou `composer` introuvable juste après l'installation** : le PATH n'est relu qu'au démarrage. Fermer et rouvrir le terminal ou l'application.
 
 ## Quel fichier lire, et quand
