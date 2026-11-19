@@ -24,7 +24,7 @@ Ce skill décrit la stack de WrestlingStory et la façon dont le groupe veut qu'
 | Base | PostgreSQL 17 | en local dans Docker Desktop (`compose.yaml`, identifiants lus dans `.env`) ; `wrestlingstory` en local, `wrestlingstory_test` pour les tests (créée par `docker/postgres/init.sql`) |
 | Modèle de langage | OpenRouter, appelé seulement par le serveur | clé dans `.env` (`OPENROUTER_API_KEY`), jamais dans le code ; plafond 1 € pour tout le projet ; modèle à choisir et justifier |
 | Qualité | Pint, Larastan niveau 7, oxlint, vue-tsc, PHPUnit 12 | |
-| CI | GitHub Actions (`.github/workflows/ci.yml`) | job `ci` : PostgreSQL 17 en service, PHP 8.4, Node 24, `npm run build` puis `composer ci:check` ; check requis pour fusionner dans `main` |
+| CI | GitHub Actions (`.github/workflows/ci.yml`) | 4 jobs en parallèle, tous obligatoires pour fusionner dans `main` : `Lint` (Pint, oxlint), `Types` (Larastan, vue-tsc après `wayfinder:generate`), `Tests` (PHPUnit sur PostgreSQL 17, après le build), `Build` (`npm run build`) ; un nouveau job doit être ajouté à la protection de `main` |
 | Production | VPS HOSTKEY : Nginx, PHP-FPM, PostgreSQL | déploiement par GitHub Actions en SSH (à faire, JF-001 lot 3) |
 
 ## Nos règles (le cœur)
@@ -59,7 +59,7 @@ Ce skill décrit la stack de WrestlingStory et la façon dont le groupe veut qu'
 | 4 | `npm run build` | un import cassé, une page qui ne compile pas |
 | 5 | l'essai réel : l'écran sur téléphone, un vrai appel au modèle avec son coût noté | ce que les tests ne voient pas |
 
-`composer ci:check` enchaîne 1 à 3 ; la CI lance `npm run build` puis `composer ci:check`. Avant de dire « fini », lance-les et montre les sorties réelles. Dis ce que tu n'as pas vérifié.
+`composer ci:check` enchaîne 1 à 3 ; la CI fait les mêmes vérifications, réparties en 4 jobs. Avant de dire « fini », lance-les et montre les sorties réelles. Dis ce que tu n'as pas vérifié.
 
 ## Pièges déjà payés
 

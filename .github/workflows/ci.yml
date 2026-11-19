@@ -1,5 +1,9 @@
-# CI of WrestlingStory: the same checks as `composer ci:check` + `npm run build`, on a real PostgreSQL 17.
-# Runs on every pull request to main and every push to main. A red job blocks the merge (required check "ci").
+# CI of WrestlingStory: four jobs run in parallel, each one is a required check to merge into main.
+#   Lint  : Pint (PHP style), oxlint and formatting (front)
+#   Types : Larastan (PHP), vue-tsc (Vue/TypeScript)
+#   Tests : PHPUnit on a real PostgreSQL 17
+#   Build : npm run build (Vite)
+# Locally, the same checks: `npm run build` then `composer ci:check`.
 name: CI
 
 on:
@@ -15,9 +19,88 @@ concurrency:
     group: ci-${{ github.ref }}
     cancel-in-progress: true
 
+# Every job starts with the same installation steps (YAML anchors are not used to keep the file readable).
 jobs:
-    ci:
-        name: ci
+    lint:
+        name: Lint
+        runs-on: ubuntu-latest
+        timeout-minutes: 10
+        steps:
+            - name: Récupérer le code
+              uses: actions/checkout@v4
+
+            - name: Installer PHP 8.4
+              uses: shivammathur/setup-php@v2
+              with:
+                  php-version: '8.4'
+                  extensions: pgsql, pdo_pgsql, mbstring, openssl, intl, curl, fileinfo, zip, sodium
+                  coverage: none
+                  tools: composer:v2
+
+            - name: Installer Node 24
+              uses: actions/setup-node@v4
+              with:
+                  node-version: '24'
+                  cache: npm
+
+            - name: Installer les dépendances PHP
+              run: composer install --no-interaction --prefer-dist --no-progress
+
+            - name: Installer les dépendances JavaScript
+              run: npm ci
+
+            - name: Style PHP (Pint)
+              run: composer lint:check
+
+            - name: Lint et formatage du front (oxlint)
+              run: npm run check
+
+    types:
+        name: Types
+        runs-on: ubuntu-latest
+        timeout-minutes: 10
+        steps:
+            - name: Récupérer le code
+              uses: actions/checkout@v4
+
+            - name: Installer PHP 8.4
+              uses: shivammathur/setup-php@v2
+              with:
+                  php-version: '8.4'
+                  extensions: pgsql, pdo_pgsql, mbstring, openssl, intl, curl, fileinfo, zip, sodium
+                  ini-values: memory_limit=512M
+                  coverage: none
+                  tools: composer:v2
+
+            - name: Installer Node 24
+              uses: actions/setup-node@v4
+              with:
+                  node-version: '24'
+                  cache: npm
+
+            - name: Installer les dépendances PHP
+              run: composer install --no-interaction --prefer-dist --no-progress
+
+            - name: Installer les dépendances JavaScript
+              run: npm ci
+
+            - name: Préparer .env
+              run: |
+                  cp .env.example .env
+                  php artisan key:generate
+
+            # vue-tsc needs the typed routes that Wayfinder generates (resources/js/routes, actions, wayfinder).
+            - name: Générer les routes typées (Wayfinder)
+              run: php artisan wayfinder:generate --with-form
+
+            - name: Analyse statique PHP (Larastan)
+              run: composer types:check
+
+            - name: Types Vue et TypeScript (vue-tsc)
+              run: npm run types:check
+
+    tests:
+        name: Tests
         runs-on: ubuntu-latest
         timeout-minutes: 15
 
@@ -53,7 +136,6 @@ jobs:
               with:
                   php-version: '8.4'
                   extensions: pgsql, pdo_pgsql, mbstring, openssl, intl, curl, fileinfo, zip, sodium
-                  ini-values: memory_limit=512M
                   coverage: none
                   tools: composer:v2
 
@@ -62,17 +144,6 @@ jobs:
               with:
                   node-version: '24'
                   cache: npm
-
-            - name: Trouver le cache Composer
-              id: composer-cache
-              run: echo "dir=$(composer config cache-files-dir)" >> "$GITHUB_OUTPUT"
-
-            - name: Mettre en cache les paquets Composer
-              uses: actions/cache@v4
-              with:
-                  path: ${{ steps.composer-cache.outputs.dir }}
-                  key: composer-${{ runner.os }}-${{ hashFiles('composer.lock') }}
-                  restore-keys: composer-${{ runner.os }}-
 
             - name: Installer les dépendances PHP
               run: composer install --no-interaction --prefer-dist --no-progress
@@ -85,10 +156,46 @@ jobs:
                   cp .env.example .env
                   php artisan key:generate
 
-            # Before the checks: Wayfinder generates the typed routes (needed by vue-tsc)
-            # and the tests need public/build/manifest.json.
-            - name: Build du front
+            # The pages rendered in the tests need public/build/manifest.json.
+            - name: Build du front (pour les tests)
               run: npm run build
 
-            - name: Vérifications (oxlint, format, vue-tsc, Pint, Larastan, tests)
-              run: composer ci:check
+            - name: Tests (PHPUnit sur PostgreSQL 17)
+              run: php artisan test
+
+    build:
+        name: Build
+        runs-on: ubuntu-latest
+        timeout-minutes: 10
+        steps:
+            - name: Récupérer le code
+              uses: actions/checkout@v4
+
+            # The build calls php (Wayfinder generates the typed routes).
+            - name: Installer PHP 8.4
+              uses: shivammathur/setup-php@v2
+              with:
+                  php-version: '8.4'
+                  extensions: pgsql, pdo_pgsql, mbstring, openssl, intl, curl, fileinfo, zip, sodium
+                  coverage: none
+                  tools: composer:v2
+
+            - name: Installer Node 24
+              uses: actions/setup-node@v4
+              with:
+                  node-version: '24'
+                  cache: npm
+
+            - name: Installer les dépendances PHP
+              run: composer install --no-interaction --prefer-dist --no-progress
+
+            - name: Installer les dépendances JavaScript
+              run: npm ci
+
+            - name: Préparer .env
+              run: |
+                  cp .env.example .env
+                  php artisan key:generate
+
+            - name: Build du front (Vite)
+              run: npm run build
