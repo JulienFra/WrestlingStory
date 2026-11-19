@@ -25,7 +25,7 @@ Ce skill décrit la stack de WrestlingStory et la façon dont le groupe veut qu'
 | Modèle de langage | OpenRouter, appelé seulement par le serveur | clé dans `.env` (`OPENROUTER_API_KEY`), jamais dans le code ; plafond 1 € pour tout le projet ; modèle à choisir et justifier |
 | Qualité | Pint, Larastan niveau 7, oxlint, vue-tsc, PHPUnit 12 | |
 | CI | GitHub Actions (`.github/workflows/ci.yml`) | 4 jobs en parallèle, tous obligatoires pour fusionner dans `main` : `Lint` (Pint, oxlint), `Types` (Larastan, vue-tsc après `wayfinder:generate`), `Tests` (PHPUnit sur PostgreSQL 17, après le build), `Build` (`npm run build`) ; un nouveau job doit être ajouté à la protection de `main` |
-| Production | VPS HOSTKEY : Nginx, PHP-FPM, PostgreSQL | déploiement par GitHub Actions en SSH (à faire, JF-001 lot 3) |
+| Production | VPS HOSTKEY, à côté de ChatPulse : Nginx, PHP 8.4-FPM (pool `wrestlingstory`), PostgreSQL 17 Docker sur 127.0.0.1:5433 | `https://wrestlingstory.82-25-58-90.sslip.io` ; déploiement automatique après une CI verte sur `main` (`.github/workflows/deploy.yml`, `deploy/release.sh`) ; installation unique `deploy/setup-vps.sh` ; voir D-002 |
 
 ## Nos règles (le cœur)
 
@@ -73,6 +73,7 @@ Ce skill décrit la stack de WrestlingStory et la façon dont le groupe veut qu'
 - **`npm run build` dit « 'php' n'est pas reconnu »** : Wayfinder appelle `php` ; le terminal a été ouvert avant l'installation de PHP. Rouvrir le terminal.
 - **Changer `DB_PASSWORD` ne change pas le mot de passe de la base Docker** : il n'est lu qu'à la création du volume, comme `init.sql`. Pour repartir de zéro (données perdues) : `docker compose down -v`, puis `docker compose up -d`.
 - **La CI échoue sur `npm ci` (« package.json and package-lock.json … in sync »)** : le lock commité n'est plus à jour. Lancer `npm install`, vérifier le diff du lock et le commiter ; ne pas annuler ce diff en le prenant pour du bruit.
+- **Revenir à la version précédente en production** : sur le VPS, `ln -sfn /var/www/wrestlingstory/releases/<version-précédente> /var/www/wrestlingstory/current` puis `sudo systemctl reload php8.4-fpm`. Les migrations ne sont pas annulées : une migration doit rester compatible avec la version d'avant.
 - **`php` ou `composer` introuvable juste après l'installation** : le PATH n'est relu qu'au démarrage. Fermer et rouvrir le terminal ou l'application.
 
 ## Quel fichier lire, et quand

@@ -60,7 +60,7 @@ Les skills du groupe vivent dans `.agents/skills/`. Claude Code les lit dans `.c
 
 ## Commandes
 
-Stack : Laravel 13 (PHP 8.4) + Vue 3 via Inertia, PostgreSQL 17, hébergé sur le VPS HOSTKEY (Nginx, PHP-FPM). Détail et versions : skill `stack-laravel-vue`, `composer.json` et `package.json`.
+Stack : Laravel 13 (PHP 8.4) + Vue 3 via Inertia, PostgreSQL 17, hébergé sur le VPS HOSTKEY (Nginx, PHP-FPM, voir D-002). Détail et versions : skill `stack-laravel-vue`, `composer.json` et `package.json`.
 
 | Pour | Commande |
 | --- | --- |
@@ -72,3 +72,4 @@ Stack : Laravel 13 (PHP 8.4) + Vue 3 via Inertia, PostgreSQL 17, hébergé sur l
 | tests | `php artisan test` (base `wrestlingstory_test`) |
 | build | `npm run build` |
 | tout d'un coup, comme la CI | `npm run build` puis `composer ci:check` (la CI : 4 jobs dans `.github/workflows/ci.yml`) |
+| déployer | automatique après une CI verte sur `main` (`.github/workflows/deploy.yml`), ou à la main depuis l'onglet Actions ; en ligne : https://wrestlingstory.82-25-58-90.sslip.io |

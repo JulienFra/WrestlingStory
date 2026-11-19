@@ -1,0 +1,117 @@
+# Deployment of WrestlingStory to the HOSTKEY VPS (JF-001, lot 3). See docs/decisions/D-002-hebergement.md.
+# Runs only after the CI workflow succeeded on main (so after a merged PR whose 4 checks were green).
+# Everything is built here (Composer without dev packages, Vite): nothing is compiled on the small VPS.
+name: Deploy
+
+on:
+    workflow_run:
+        workflows: [CI]
+        types: [completed]
+        branches: [main]
+    # Manual run from the Actions tab (redeploy the current main).
+    workflow_dispatch:
+
+permissions:
+    contents: read
+
+# One deployment at a time, never cancelled halfway.
+concurrency:
+    group: deploy-production
+    cancel-in-progress: false
+
+env:
+    VPS_HOST: 82.25.58.90
+    VPS_USER: deploy
+    APP_URL: https://wrestlingstory.82-25-58-90.sslip.io
+    # Public host key of the VPS (ssh-keyscan -t ed25519 82.25.58.90): protects against a fake server.
+    VPS_HOST_KEY: '82.25.58.90 ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBOBs6+AAydnqYCLGN9eXr3FX5Sysia3WLC+ulJ3FROK'
+
+jobs:
+    deploy:
+        name: Deploy
+        if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
+        runs-on: ubuntu-latest
+        timeout-minutes: 15
+        environment:
+            name: production
+            url: ${{ env.APP_URL }}
+
+        steps:
+            - name: Récupérer le code testé par la CI
+              uses: actions/checkout@v4
+              with:
+                  ref: ${{ github.event.workflow_run.head_sha || github.sha }}
+
+            - name: Installer PHP 8.4
+              uses: shivammathur/setup-php@v2
+              with:
+                  php-version: '8.4'
+                  extensions: pgsql, pdo_pgsql, mbstring, openssl, intl, curl, fileinfo, zip, sodium
+                  coverage: none
+                  tools: composer:v2
+
+            - name: Installer Node 24
+              uses: actions/setup-node@v4
+              with:
+                  node-version: '24'
+                  cache: npm
+
+            - name: Dépendances PHP de production (sans les outils de dev)
+              run: composer install --no-dev --no-interaction --prefer-dist --no-progress --optimize-autoloader
+
+            - name: Dépendances JavaScript
+              run: npm ci
+
+            # The build calls php artisan (Wayfinder): it needs a .env, which is deleted right after.
+            - name: Build du front
+              run: |
+                  cp .env.example .env
+                  php artisan key:generate
+                  npm run build
+                  rm .env
+
+            - name: Préparer l'archive de la version
+              id: archive
+              run: |
+                  NAME="$(date -u +%Y%m%d-%H%M%S)-${GITHUB_SHA::7}"
+                  echo "name=$NAME" >> "$GITHUB_OUTPUT"
+                  tar -czf "/tmp/$NAME.tar.gz" \
+                      --exclude=./.git --exclude=./.github --exclude=./node_modules \
+                      --exclude=./tests --exclude=./storage --exclude=./docs \
+                      --exclude=./.env --exclude=./bootstrap/cache/config.php \
+                      .
+                  ls -lh "/tmp/$NAME.tar.gz"
+
+            - name: Préparer la connexion SSH
+              env:
+                  VPS_SSH_KEY: ${{ secrets.VPS_SSH_KEY }}
+              run: |
+                  mkdir -p ~/.ssh
+                  chmod 700 ~/.ssh
+                  printf '%s\n' "$VPS_SSH_KEY" > ~/.ssh/id_deploy
+                  chmod 600 ~/.ssh/id_deploy
+                  echo "$VPS_HOST_KEY" > ~/.ssh/known_hosts
+
+            - name: Envoyer et installer la version sur le VPS
+              run: |
+                  NAME="${{ steps.archive.outputs.name }}"
+                  SSH="ssh -i ~/.ssh/id_deploy -o StrictHostKeyChecking=yes"
+                  scp -i ~/.ssh/id_deploy -o StrictHostKeyChecking=yes \
+                      "/tmp/$NAME.tar.gz" deploy/release.sh \
+                      "$VPS_USER@$VPS_HOST:/var/www/wrestlingstory/releases/"
+                  $SSH "$VPS_USER@$VPS_HOST" "bash /var/www/wrestlingstory/releases/release.sh '$NAME' && rm -f /var/www/wrestlingstory/releases/release.sh"
+
+            - name: Vérifier que le site répond
+              run: |
+                  for i in 1 2 3 4 5; do
+                      code="$(curl -s -o /dev/null -w '%{http_code}' "$APP_URL/")"
+                      echo "Tentative $i : HTTP $code"
+                      [ "$code" = "200" ] && exit 0
+                      sleep 5
+                  done
+                  echo "Le site ne répond pas 200 après le déploiement." >&2
+                  exit 1
+
+            - name: Effacer la clé SSH du runner
+              if: always()
+              run: rm -f ~/.ssh/id_deploy
