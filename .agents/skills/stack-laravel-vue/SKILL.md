@@ -24,6 +24,7 @@ Ce skill décrit la stack de WrestlingStory et la façon dont le groupe veut qu'
 | Base | PostgreSQL 17 | en local dans Docker Desktop (`compose.yaml`, identifiants lus dans `.env`) ; `wrestlingstory` en local, `wrestlingstory_test` pour les tests (créée par `docker/postgres/init.sql`) |
 | Modèle de langage | OpenRouter, appelé seulement par le serveur | clé dans `.env` (`OPENROUTER_API_KEY`), jamais dans le code ; plafond 1 € pour tout le projet ; modèle à choisir et justifier |
 | Qualité | Pint, Larastan niveau 7, oxlint, vue-tsc, PHPUnit 12 | |
+| CI | GitHub Actions (`.github/workflows/ci.yml`) | job `ci` : PostgreSQL 17 en service, PHP 8.4, Node 24, `npm run build` puis `composer ci:check` ; check requis pour fusionner dans `main` |
 | Production | VPS HOSTKEY : Nginx, PHP-FPM, PostgreSQL | déploiement par GitHub Actions en SSH (à faire, JF-001 lot 3) |
 
 ## Nos règles (le cœur)
@@ -58,7 +59,7 @@ Ce skill décrit la stack de WrestlingStory et la façon dont le groupe veut qu'
 | 4 | `npm run build` | un import cassé, une page qui ne compile pas |
 | 5 | l'essai réel : l'écran sur téléphone, un vrai appel au modèle avec son coût noté | ce que les tests ne voient pas |
 
-`composer ci:check` enchaîne 1 à 3 comme la CI. Avant de dire « fini », lance-les et montre les sorties réelles. Dis ce que tu n'as pas vérifié.
+`composer ci:check` enchaîne 1 à 3 ; la CI lance `npm run build` puis `composer ci:check`. Avant de dire « fini », lance-les et montre les sorties réelles. Dis ce que tu n'as pas vérifié.
 
 ## Pièges déjà payés
 
@@ -71,6 +72,7 @@ Ce skill décrit la stack de WrestlingStory et la façon dont le groupe veut qu'
 - **`composer setup` s'arrête sur « exceeded the timeout of 300 seconds »** : premier `composer install` lent sous Windows. Relancer avec `COMPOSER_PROCESS_TIMEOUT=0`, ou finir les étapes à la main (`php artisan key:generate`, `php artisan migrate`, `npm install`, `npm run build`).
 - **`npm run build` dit « 'php' n'est pas reconnu »** : Wayfinder appelle `php` ; le terminal a été ouvert avant l'installation de PHP. Rouvrir le terminal.
 - **Changer `DB_PASSWORD` ne change pas le mot de passe de la base Docker** : il n'est lu qu'à la création du volume, comme `init.sql`. Pour repartir de zéro (données perdues) : `docker compose down -v`, puis `docker compose up -d`.
+- **La CI échoue sur `npm ci` (« package.json and package-lock.json … in sync »)** : le lock commité n'est plus à jour. Lancer `npm install`, vérifier le diff du lock et le commiter ; ne pas annuler ce diff en le prenant pour du bruit.
 - **`php` ou `composer` introuvable juste après l'installation** : le PATH n'est relu qu'au démarrage. Fermer et rouvrir le terminal ou l'application.
 
 ## Quel fichier lire, et quand

@@ -1,0 +1,94 @@
+# CI of WrestlingStory: the same checks as `composer ci:check` + `npm run build`, on a real PostgreSQL 17.
+# Runs on every pull request to main and every push to main. A red job blocks the merge (required check "ci").
+name: CI
+
+on:
+    pull_request:
+        branches: [main]
+    push:
+        branches: [main]
+
+permissions:
+    contents: read
+
+concurrency:
+    group: ci-${{ github.ref }}
+    cancel-in-progress: true
+
+jobs:
+    ci:
+        name: ci
+        runs-on: ubuntu-latest
+        timeout-minutes: 15
+
+        services:
+            postgres:
+                image: postgres:17
+                env:
+                    POSTGRES_USER: postgres
+                    POSTGRES_DB: wrestlingstory_test
+                    # Throwaway database of the job: no password needed.
+                    POSTGRES_HOST_AUTH_METHOD: trust
+                ports:
+                    - 5432:5432
+                options: >-
+                    --health-cmd "pg_isready -U postgres"
+                    --health-interval 5s
+                    --health-timeout 5s
+                    --health-retries 10
+
+        env:
+            DB_CONNECTION: pgsql
+            DB_HOST: 127.0.0.1
+            DB_PORT: 5432
+            DB_USERNAME: postgres
+            DB_PASSWORD: ''
+
+        steps:
+            - name: Récupérer le code
+              uses: actions/checkout@v4
+
+            - name: Installer PHP 8.4
+              uses: shivammathur/setup-php@v2
+              with:
+                  php-version: '8.4'
+                  extensions: pgsql, pdo_pgsql, mbstring, openssl, intl, curl, fileinfo, zip, sodium
+                  ini-values: memory_limit=512M
+                  coverage: none
+                  tools: composer:v2
+
+            - name: Installer Node 24
+              uses: actions/setup-node@v4
+              with:
+                  node-version: '24'
+                  cache: npm
+
+            - name: Trouver le cache Composer
+              id: composer-cache
+              run: echo "dir=$(composer config cache-files-dir)" >> "$GITHUB_OUTPUT"
+
+            - name: Mettre en cache les paquets Composer
+              uses: actions/cache@v4
+              with:
+                  path: ${{ steps.composer-cache.outputs.dir }}
+                  key: composer-${{ runner.os }}-${{ hashFiles('composer.lock') }}
+                  restore-keys: composer-${{ runner.os }}-
+
+            - name: Installer les dépendances PHP
+              run: composer install --no-interaction --prefer-dist --no-progress
+
+            - name: Installer les dépendances JavaScript
+              run: npm ci
+
+            - name: Préparer .env
+              run: |
+                  cp .env.example .env
+                  php artisan key:generate
+
+            # Before the checks: Wayfinder generates the typed routes (needed by vue-tsc)
+            # and the tests need public/build/manifest.json.
+            - name: Build du front
+              run: npm run build
+
+            - name: Vérifications (oxlint, format, vue-tsc, Pint, Larastan, tests)
+              run: composer ci:check
