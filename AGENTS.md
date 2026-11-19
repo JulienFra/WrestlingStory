@@ -60,14 +60,14 @@ Les skills du groupe vivent dans `.agents/skills/`. Claude Code les lit dans `.c
 
 ## Commandes
 
-Stack : Laravel (PHP) + Vue 3 via Inertia, PostgreSQL, hébergé sur le VPS HOSTKEY (Nginx, PHP-FPM). Versions exactes : à lire dans `composer.json` et `package.json` une fois le projet créé.
-
-Commandes prévues, **à confirmer** quand le projet Laravel sera créé (une commande non confirmée ne se lance pas les yeux fermés) :
+Stack : Laravel 13 (PHP 8.4) + Vue 3 via Inertia, PostgreSQL 17, hébergé sur le VPS HOSTKEY (Nginx, PHP-FPM). Détail et versions : skill `stack-laravel-vue`, `composer.json` et `package.json`.
 
 | Pour | Commande |
 | --- | --- |
-| lancer l'application | `composer run dev` |
-| lint et format | `vendor/bin/pint --test` puis `npm run lint` |
-| types ou analyse statique | `vendor/bin/phpstan analyse` (Larastan, à installer) puis `npx vue-tsc --noEmit` |
-| tests | `php artisan test` |
+| installer après un clone | `composer setup` (puis remplir `DB_PASSWORD` dans `.env`) |
+| lancer l'application | `composer dev` |
+| lint et format | `composer lint:check` (Pint) puis `npm run check` (oxlint et formatage) |
+| types ou analyse statique | `composer types:check` (Larastan) puis `npm run types:check` (vue-tsc) |
+| tests | `php artisan test` (base `wrestlingstory_test`) |
 | build | `npm run build` |
+| tout d'un coup, comme la CI | `composer ci:check` |

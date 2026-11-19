@@ -1,7 +1,7 @@
 ---
 id: JF-001
 titre: Squelette Laravel + Vue/Inertia déployé sur le VPS
-statut: ouvert            # ouvert | en cours | bloqué | terminé | abandonné
+statut: en cours          # ouvert | en cours | bloqué | terminé | abandonné
 branche: feature/squelette-laravel
 créé: 2026-11-19
 mis-à-jour: 2026-11-19
@@ -23,3 +23,4 @@ Aucun code n'existe encore. WrestlingStory a besoin d'un projet Laravel + Vue 3 
 ## Journal du ticket
 
 - 2026-11-19 : créé. Idée, stack et hébergeur validés par le professeur.
+- 2026-11-19 : lot 1 (squelette local) presque fini sur le PC fixe. Laravel 13.43 + Vue/Inertia 3 créé à la racine, PostgreSQL configuré (`wrestlingstory`, `wrestlingstory_test`). Vérifiés : `composer lint:check`, `composer types:check`, `npm run check`, `npm run types:check`, `npm run build`. Non vérifiés : `php artisan migrate`, `php artisan test`, la page en local (mot de passe PostgreSQL inconnu sur ce PC). Lots 2 (CI) et 3 (déploiement) pas commencés. Le workflow `.github/workflows/tests.yml` du kit a été mis de côté, à refaire au lot 2.
