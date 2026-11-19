@@ -1,7 +1,7 @@
 ---
 id: JF-002
 titre: Pseudo unique sans caractère spécial et e-mail au bon format, vérifiés par le serveur
-statut: en cours          # ouvert | en cours | bloqué | terminé | abandonné
+statut: terminé           # ouvert | en cours | bloqué | terminé | abandonné
 branche: feature/squelette-laravel
 créé: 2026-11-19
 mis-à-jour: 2026-11-19
@@ -22,3 +22,4 @@ Le starter kit accepte n'importe quel nom (espaces, doublons) et des e-mails com
 
 - 2026-11-19 : créé et fait. Règles dans `ProfileValidationRules`, nouvelle migration d'index, middleware `EnsureEmailIsText` sur les routes Fortify, clé du limiteur de connexion protégée. Les tests ont révélé deux erreurs 500 du kit avec `email[]=…` (inscription, connexion), corrigées. Vérifiés : `composer ci:check` (54 tests, 51 réussis, 3 ignorés), `npm run build`, essai dans le navigateur avec `required`/`pattern` retirés à la main (messages français affichés, saisie conservée). Non vérifié : téléphone.
 - 2026-11-19 (nuit) : essai sous `composer dev` : profil avec `Demo Booker!` (attributs HTML retirés) refusé avec le message français, base inchangée ; inscription `demo_booker` refusée (« Ce pseudo est déjà pris. ») car `Demo_Booker` existe.
+- 2026-11-19 (nuit) : terminé. Florentin d'accord sans relecture formelle ; fusionné avec la PR #2.

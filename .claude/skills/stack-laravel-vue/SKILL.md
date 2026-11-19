@@ -28,7 +28,7 @@ Ce skill décrit la stack de WrestlingStory et la façon dont le groupe veut qu'
 
 ## Nos règles (le cœur)
 
-> Proposées par Julien le 2026-11-19. À valider par Florentin dans la PR ; ce qui est refusé sort d'ici.
+> Proposées par Julien et acceptées par Florentin le 2026-11-19. Une règle se change par PR.
 
 - **Où va chaque chose** :
   - validation des entrées : une `FormRequest` dans `app/Http/Requests/`, jamais dans le contrôleur ;

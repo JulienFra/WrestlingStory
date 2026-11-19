@@ -1,7 +1,7 @@
 ---
 id: D-001
 titre: Laravel + Vue 3 (Inertia) + PostgreSQL 17, hébergés sur le VPS HOSTKEY
-statut: proposée          # proposée | acceptée | remplacée par D-00N
+statut: acceptée          # proposée | acceptée | remplacée par D-00N
 proposée-par: julien
 date: 2026-11-19
 ---
