@@ -1,7 +1,7 @@
 ---
 id: JF-001
 titre: Squelette Laravel + Vue/Inertia déployé sur le VPS
-statut: ouvert            # ouvert | en cours | bloqué | terminé | abandonné
+statut: en cours          # ouvert | en cours | bloqué | terminé | abandonné
 branche: feature/squelette-laravel
 créé: 2026-11-19
 mis-à-jour: 2026-11-19
@@ -12,8 +12,8 @@ Aucun code n'existe encore. WrestlingStory a besoin d'un projet Laravel + Vue 3 
 
 ## Critères d'acceptation
 
-- [ ] Le projet est créé avec le starter kit officiel Laravel + Vue, et `composer run dev` affiche la page d'accueil en local.
-- [ ] L'application utilise PostgreSQL et `php artisan migrate` passe sur une base vide.
+- [x] Le projet est créé avec le starter kit officiel Laravel + Vue, et `composer run dev` affiche la page d'accueil en local.
+- [x] L'application utilise PostgreSQL et `php artisan migrate` passe sur une base vide.
 - [ ] Les commandes de la table « Commandes » de `AGENTS.md` sont confirmées (lancées une fois chacune) ou corrigées.
 - [ ] Une PR vers `main` déclenche la CI : lint (Pint, ESLint), tests (`php artisan test`) et build (`npm run build`) ; un job rouge bloque le merge.
 - [ ] Un merge sur `main` déploie automatiquement sur le VPS (PHP-FPM derrière Nginx, migrations appliquées).
@@ -23,3 +23,7 @@ Aucun code n'existe encore. WrestlingStory a besoin d'un projet Laravel + Vue 3 
 ## Journal du ticket
 
 - 2026-11-19 : créé. Idée, stack et hébergeur validés par le professeur.
+- 2026-11-19 : lot 1 (squelette local) presque fini sur le PC fixe. Laravel 13.43 + Vue/Inertia 3 créé à la racine, PostgreSQL configuré (`wrestlingstory`, `wrestlingstory_test`). Vérifiés : `composer lint:check`, `composer types:check`, `npm run check`, `npm run types:check`, `npm run build`. Non vérifiés : `php artisan migrate`, `php artisan test`, la page en local (mot de passe PostgreSQL inconnu sur ce PC). Lots 2 (CI) et 3 (déploiement) pas commencés. Le workflow `.github/workflows/tests.yml` du kit a été mis de côté, à refaire au lot 2.
+- 2026-11-19 (soir) : reprise sur le PC portable. PHP 8.4.27 et Composer 2.11.2 installés. PostgreSQL local passe par Docker Desktop : `compose.yaml` + `docker/postgres/init.sql`, ordre d'installation corrigé dans `AGENTS.md` (`composer setup` lance `migrate`, la base doit tourner avant). Vérifié : `docker compose config` valide, et refuse de démarrer sans `DB_PASSWORD`. Non vérifié : conteneur démarré, `migrate`, tests, page locale (`.env` à remplir par Julien).
+- 2026-11-19 (soir, suite) : à la demande de Julien, l'agent a créé `.env` depuis `.env.example` avec un `DB_PASSWORD` aléatoire, jamais affiché. `DB_PORT=5433`, parce que 5432 est pris par `chatapp_postgres`. Conteneur `healthy`, bases `wrestlingstory` et `wrestlingstory_test` présentes. Vérifiés : `php artisan migrate` (4 migrations), `composer ci:check` (Pint, oxlint et format, Larastan 0 erreur, vue-tsc, PHPUnit 27 réussis et 3 ignorés car fonctions Fortify désactivées, 76 assertions), `npm run build`, page d'accueil 200 sans erreur console via `php artisan serve`. Non vérifiés : `composer dev` lui-même ; `composer setup` d'un bout à l'autre (délai Composer de 300 s dépassé, étapes finies à la main).
+- 2026-11-19 (nuit) : `composer dev` essayé : serveur sur 8000, Vite sur 5173, file d'attente active, sans erreur au démarrage. Parcours réel dans le navigateur : inscription `Demo_Booker`, tableau de bord, profil, déconnexion, connexion. Avertissements Vue « Hydration mismatch » (SSR) sur `AppLayout`, aussi sur le tableau de bord non modifié : vient du kit, à regarder plus tard. Toutes les commandes de la table « Commandes » ont tourné au moins une fois ; `composer setup` seulement par étapes (délai de 300 s).
