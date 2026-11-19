@@ -21,7 +21,7 @@ Ce skill décrit la stack de WrestlingStory et la façon dont le groupe veut qu'
 | Auth | Fortify (inscription, connexion, confirmation du mot de passe, passkeys) | pas de vérification d'e-mail ni de 2FA : pas de serveur mail |
 | Front | Vue 3 + TypeScript, Inertia 3, Tailwind 4, composants shadcn-vue dans `resources/js/components/ui/` | Wayfinder génère les routes typées dans `resources/js/routes/` et `resources/js/actions/` : ne les édite pas |
 | Outils front | Vite+ (`vp`) : build, oxlint, formatage | config dans `vite.config.ts` |
-| Base | PostgreSQL 17 | `wrestlingstory` en local, `wrestlingstory_test` pour les tests |
+| Base | PostgreSQL 17 | en local dans Docker Desktop (`compose.yaml`, identifiants lus dans `.env`) ; `wrestlingstory` en local, `wrestlingstory_test` pour les tests (créée par `docker/postgres/init.sql`) |
 | Modèle de langage | OpenRouter, appelé seulement par le serveur | clé dans `.env` (`OPENROUTER_API_KEY`), jamais dans le code ; plafond 1 € pour tout le projet ; modèle à choisir et justifier |
 | Qualité | Pint, Larastan niveau 7, oxlint, vue-tsc, PHPUnit 12 | |
 | Production | VPS HOSTKEY : Nginx, PHP-FPM, PostgreSQL | déploiement par GitHub Actions en SSH (à faire, JF-001 lot 3) |
@@ -66,6 +66,11 @@ Ce skill décrit la stack de WrestlingStory et la façon dont le groupe veut qu'
 - **Retirer les passkeys du starter kit casse le build** (`PasskeyVerify.vue` introuvable) : la suppression est incomplète. On garde les passkeys.
 - **PHPStan s'arrête sur « reached configured PHP memory limit: 128M »** : `php.ini` par défaut. Mettre `memory_limit = 512M` dans le `php.ini` local.
 - **`npm run check` signale des fichiers Markdown** : le formateur lisait la documentation. `docs/`, `consignes/` et `*.md` sont ignorés dans `vite.config.ts`.
+- **`composer setup` échoue sur `migrate`** : la base ne tourne pas encore. Lancer `docker compose up -d` avant, avec `DB_PASSWORD` déjà rempli dans `.env`.
+- **`docker compose up -d` échoue sur « port is already allocated »** : un autre PostgreSQL occupe 5432 (chez Julien, le conteneur `chatapp_postgres` de ChatPulse). Mettre `DB_PORT=5433` dans `.env` : Compose et Laravel lisent la même variable.
+- **`composer setup` s'arrête sur « exceeded the timeout of 300 seconds »** : premier `composer install` lent sous Windows. Relancer avec `COMPOSER_PROCESS_TIMEOUT=0`, ou finir les étapes à la main (`php artisan key:generate`, `php artisan migrate`, `npm install`, `npm run build`).
+- **`npm run build` dit « 'php' n'est pas reconnu »** : Wayfinder appelle `php` ; le terminal a été ouvert avant l'installation de PHP. Rouvrir le terminal.
+- **Changer `DB_PASSWORD` ne change pas le mot de passe de la base Docker** : il n'est lu qu'à la création du volume, comme `init.sql`. Pour repartir de zéro (données perdues) : `docker compose down -v`, puis `docker compose up -d`.
 - **`php` ou `composer` introuvable juste après l'installation** : le PATH n'est relu qu'au démarrage. Fermer et rouvrir le terminal ou l'application.
 
 ## Quel fichier lire, et quand

@@ -64,7 +64,8 @@ Stack : Laravel 13 (PHP 8.4) + Vue 3 via Inertia, PostgreSQL 17, hébergé sur l
 
 | Pour | Commande |
 | --- | --- |
-| installer après un clone | `composer setup` (puis remplir `DB_PASSWORD` dans `.env`) |
+| installer après un clone | copier `.env.example` en `.env` et y remplir `DB_PASSWORD`, puis `docker compose up -d` (PostgreSQL), puis `composer setup` |
+| démarrer ou arrêter la base | `docker compose up -d` / `docker compose down` (Docker Desktop lancé) |
 | lancer l'application | `composer dev` |
 | lint et format | `composer lint:check` (Pint) puis `npm run check` (oxlint et formatage) |
 | types ou analyse statique | `composer types:check` (Larastan) puis `npm run types:check` (vue-tsc) |
