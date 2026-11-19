@@ -1,7 +1,7 @@
 ---
 id: D-002
 titre: WrestlingStory sur le VPS HOSTKEY à côté de ChatPulse, sans nom de domaine (sslip.io + HTTPS)
-statut: proposée          # proposée | acceptée | remplacée par D-00N
+statut: acceptée          # proposée | acceptée | remplacée par D-00N
 proposée-par: julien
 date: 2026-11-19
 ---
