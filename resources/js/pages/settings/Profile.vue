@@ -43,16 +43,24 @@ const user = computed(() => page.props.auth.user);
             v-slot="{ errors, processing }"
         >
             <div class="grid gap-2">
-                <Label for="name">Name</Label>
+                <Label for="name">Pseudo</Label>
                 <Input
                     id="name"
                     class="mt-1 block w-full"
                     name="name"
                     :default-value="user.name"
                     required
-                    autocomplete="name"
-                    placeholder="Full name"
+                    autocomplete="username"
+                    minlength="3"
+                    maxlength="30"
+                    pattern="[A-Za-z0-9_]+"
+                    title="Lettres sans accent, chiffres et _ uniquement"
+                    placeholder="Pseudo"
+                    aria-describedby="name-help"
                 />
+                <p id="name-help" class="text-sm text-muted-foreground">
+                    3 à 30 caractères : lettres sans accent, chiffres et _.
+                </p>
                 <InputError class="mt-2" :message="errors.name" />
             </div>
 

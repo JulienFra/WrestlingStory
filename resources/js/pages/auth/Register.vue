@@ -33,17 +33,25 @@ defineOptions({
     >
         <div class="grid gap-6">
             <div class="grid gap-2">
-                <Label for="name">Name</Label>
+                <Label for="name">Pseudo</Label>
                 <Input
                     id="name"
                     type="text"
                     required
                     v-focus
                     :tabindex="1"
-                    autocomplete="name"
+                    autocomplete="username"
                     name="name"
-                    placeholder="Full name"
+                    minlength="3"
+                    maxlength="30"
+                    pattern="[A-Za-z0-9_]+"
+                    title="Lettres sans accent, chiffres et _ uniquement"
+                    placeholder="Pseudo"
+                    aria-describedby="name-help"
                 />
+                <p id="name-help" class="text-sm text-muted-foreground">
+                    3 à 30 caractères : lettres sans accent, chiffres et _.
+                </p>
                 <InputError :message="errors.name" />
             </div>
 

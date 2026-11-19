@@ -77,7 +77,9 @@ class FortifyServiceProvider extends ServiceProvider
     {
 
         RateLimiter::for('login', function (Request $request) {
-            $throttleKey = Str::transliterate(Str::lower($request->input(Fortify::username())).'|'.$request->ip());
+            // The email may not be a string if the form was edited in the dev tools: the login validation refuses it later.
+            $email = $request->input(Fortify::username());
+            $throttleKey = Str::transliterate(Str::lower(is_string($email) ? $email : '').'|'.$request->ip());
 
             return Limit::perMinute(5)->by($throttleKey);
         });

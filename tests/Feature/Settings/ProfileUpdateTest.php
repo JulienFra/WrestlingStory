@@ -28,7 +28,7 @@ class ProfileUpdateTest extends TestCase
         $response = $this
             ->actingAs($user)
             ->patch(route('profile.update'), [
-                'name' => 'Test User',
+                'name' => 'TestUser',
                 'email' => 'test@example.com',
             ]);
 
@@ -38,7 +38,7 @@ class ProfileUpdateTest extends TestCase
 
         $user->refresh();
 
-        $this->assertSame('Test User', $user->name);
+        $this->assertSame('TestUser', $user->name);
         $this->assertSame('test@example.com', $user->email);
         $this->assertNull($user->email_verified_at);
     }
@@ -50,7 +50,7 @@ class ProfileUpdateTest extends TestCase
         $this
             ->actingAs($user)
             ->patch(route('profile.update'), [
-                'name' => 'Test User',
+                'name' => 'TestUser',
                 'email' => 'Test@Example.com',
             ])
             ->assertSessionHasNoErrors();
@@ -77,7 +77,7 @@ class ProfileUpdateTest extends TestCase
             ->actingAs($user)
             ->from(route('profile.edit'))
             ->patch(route('profile.update'), [
-                'name' => 'Test User',
+                'name' => 'TestUser',
                 'email' => 'Taken@Example.com',
             ]);
 
@@ -93,7 +93,7 @@ class ProfileUpdateTest extends TestCase
         $response = $this
             ->actingAs($user)
             ->patch(route('profile.update'), [
-                'name' => 'Test User',
+                'name' => 'TestUser',
                 'email' => $user->email,
             ]);
 
@@ -120,6 +120,65 @@ class ProfileUpdateTest extends TestCase
 
         $this->assertGuest();
         $this->assertNull($user->fresh());
+    }
+
+    public function test_profile_update_refuses_a_pseudo_with_a_space()
+    {
+        $user = User::factory()->create(['name' => 'Julien']);
+
+        $this
+            ->actingAs($user)
+            ->patch(route('profile.update'), [
+                'name' => 'Ju lien',
+                'email' => $user->email,
+            ])
+            ->assertSessionHasErrors('name');
+
+        $this->assertSame('Julien', $user->refresh()->name);
+    }
+
+    public function test_profile_update_refuses_a_pseudo_taken_by_another_player_whatever_its_case()
+    {
+        User::factory()->create(['name' => 'Julien']);
+        $user = User::factory()->create(['name' => 'Florentin']);
+
+        $this
+            ->actingAs($user)
+            ->patch(route('profile.update'), [
+                'name' => 'JULIEN',
+                'email' => $user->email,
+            ])
+            ->assertSessionHasErrors(['name' => 'Ce pseudo est déjà pris.']);
+
+        $this->assertSame('Florentin', $user->refresh()->name);
+    }
+
+    public function test_player_can_change_the_case_of_their_own_pseudo()
+    {
+        $user = User::factory()->create(['name' => 'julien']);
+
+        $this
+            ->actingAs($user)
+            ->patch(route('profile.update'), [
+                'name' => 'Julien',
+                'email' => $user->email,
+            ])
+            ->assertSessionHasNoErrors();
+
+        $this->assertSame('Julien', $user->refresh()->name);
+    }
+
+    public function test_profile_update_refuses_an_email_without_a_real_domain()
+    {
+        $user = User::factory()->create();
+
+        $this
+            ->actingAs($user)
+            ->patch(route('profile.update'), [
+                'name' => $user->name,
+                'email' => 'julien@site',
+            ])
+            ->assertSessionHasErrors('email');
     }
 
     public function test_correct_password_must_be_provided_to_delete_account()
