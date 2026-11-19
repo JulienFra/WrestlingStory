@@ -16,9 +16,9 @@ Aucun code n'existe encore. WrestlingStory a besoin d'un projet Laravel + Vue 3 
 - [x] L'application utilise PostgreSQL et `php artisan migrate` passe sur une base vide.
 - [ ] Les commandes de la table « Commandes » de `AGENTS.md` sont confirmées (lancées une fois chacune) ou corrigées.
 - [x] Une PR vers `main` déclenche la CI : lint (Pint, oxlint), types (Larastan, vue-tsc), tests (`php artisan test`) et build (`npm run build`) ; un job rouge bloque le merge.
-- [ ] Un merge sur `main` déploie automatiquement sur le VPS (PHP-FPM derrière Nginx, migrations appliquées).
-- [ ] La page d'accueil répond en production, à l'adresse publique du VPS.
-- [ ] Aucun secret dans le dépôt : `.env` ignoré par git, secrets du déploiement dans les GitHub Secrets.
+- [x] Un merge sur `main` déploie automatiquement sur le VPS (PHP-FPM derrière Nginx, migrations appliquées).
+- [x] La page d'accueil répond en production, à l'adresse publique du VPS.
+- [x] Aucun secret dans le dépôt : `.env` ignoré par git, secrets du déploiement dans les GitHub Secrets.
 
 ## Journal du ticket
 
@@ -32,3 +32,4 @@ Aucun code n'existe encore. WrestlingStory a besoin d'un projet Laravel + Vue 3 
 - 2026-11-19 (nuit) : CI découpée en 4 jobs obligatoires (`Lint`, `Types`, `Tests`, `Build`) à la demande de Julien, pour voir d'un coup d'œil ce qui casse ; branche `feature/ci-jobs`.
 - 2026-11-19 (nuit) : protection de `main` : check `ci` remplacé par `Lint`, `Types`, `Tests`, `Build` (vérifié dans les réglages). Les 4 jobs verts sur la PR #4.
 - 2026-11-19 (nuit) : lot 3 écrit sur `feature/deploy` : `deploy/setup-vps.sh` (installation unique, lancée par Julien), `deploy/release.sh`, configs Nginx et PHP-FPM, `.github/workflows/deploy.yml` (après une CI verte sur `main`), D-002, SSR Inertia désactivable par `INERTIA_SSR_ENABLED`. Adresse : https://wrestlingstory.82-25-58-90.sslip.io. Non vérifié : installation sur le VPS, premier déploiement.
+- 2026-11-19 : `deploy/setup-vps.sh` lancé par Julien, secret `VPS_SSH_KEY` ajouté, PR #6 fusionnée. Workflow « Deploy » vert après la CI sur `main`. Vérifiés : https://wrestlingstory.82-25-58-90.sslip.io répond 200 en HTTPS (certificat valide, HTTP redirige en 301, HSTS et en-têtes de sécurité), `/login` et `/register` 200, `/dashboard` redirige vers la connexion, `/.env` 403, cookies `secure` et `httponly`, `APP_ENV=production` et debug OFF, 5 migrations appliquées, aucun log d'erreur, ChatPulse répond toujours. Version en ligne : `20261119-125806-fd4dd9d`. Non vérifiés : une inscription réelle en production, le retour à une version précédente.
