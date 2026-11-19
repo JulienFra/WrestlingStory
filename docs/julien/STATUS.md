@@ -2,7 +2,7 @@
 
 ## Où j'en suis
 
-Le squelette (JF-001 lot 1), JF-002 et la CI GitHub Actions (lot 2, PR #3) sont dans `main`. La protection de `main` exige une PR et le check `ci` vert sur une branche à jour, sans approbation (choix de Julien). Reste le lot 3 : le déploiement sur le VPS.
+Le squelette (JF-001 lot 1), JF-002 et la CI GitHub Actions (lot 2, PR #3 puis 4 jobs en PR #4) sont dans `main`. La protection de `main` exige une PR et les 4 checks `Lint`, `Types`, `Tests`, `Build` verts sur une branche à jour, sans approbation (choix de Julien). Reste le lot 3 : le déploiement sur le VPS.
 
 ## Tickets ouverts
 
