@@ -15,7 +15,7 @@ Aucun code n'existe encore. WrestlingStory a besoin d'un projet Laravel + Vue 3 
 - [x] Le projet est créé avec le starter kit officiel Laravel + Vue, et `composer run dev` affiche la page d'accueil en local.
 - [x] L'application utilise PostgreSQL et `php artisan migrate` passe sur une base vide.
 - [ ] Les commandes de la table « Commandes » de `AGENTS.md` sont confirmées (lancées une fois chacune) ou corrigées.
-- [ ] Une PR vers `main` déclenche la CI : lint (Pint, ESLint), tests (`php artisan test`) et build (`npm run build`) ; un job rouge bloque le merge.
+- [ ] Une PR vers `main` déclenche la CI : lint (Pint, oxlint), types (Larastan, vue-tsc), tests (`php artisan test`) et build (`npm run build`) ; un job rouge bloque le merge.
 - [ ] Un merge sur `main` déploie automatiquement sur le VPS (PHP-FPM derrière Nginx, migrations appliquées).
 - [ ] La page d'accueil répond en production, à l'adresse publique du VPS.
 - [ ] Aucun secret dans le dépôt : `.env` ignoré par git, secrets du déploiement dans les GitHub Secrets.

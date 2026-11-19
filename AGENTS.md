@@ -71,4 +71,4 @@ Stack : Laravel 13 (PHP 8.4) + Vue 3 via Inertia, PostgreSQL 17, hébergé sur l
 | types ou analyse statique | `composer types:check` (Larastan) puis `npm run types:check` (vue-tsc) |
 | tests | `php artisan test` (base `wrestlingstory_test`) |
 | build | `npm run build` |
-| tout d'un coup, comme la CI | `composer ci:check` |
+| tout d'un coup, comme la CI | `npm run build` puis `composer ci:check` (la CI : `.github/workflows/ci.yml`) |
