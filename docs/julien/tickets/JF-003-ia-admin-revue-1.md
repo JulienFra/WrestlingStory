@@ -1,7 +1,7 @@
 ---
 id: JF-003
 titre: Service IA, journal des appels, quotas, erreurs IA et tableau de bord admin (revue n°1)
-statut: en cours           # ouvert | en cours | bloqué | terminé | abandonné
+statut: terminé           # ouvert | en cours | bloqué | terminé | abandonné
 branche: feature/jf-003-roles, puis feature/jf-003-ia, puis feature/jf-003-ecrans (une PR par lot)
 créé: 2026-11-23
 mis-à-jour: 2026-11-23
@@ -25,8 +25,8 @@ La revue n°1 du 24 novembre attend « tableau de bord administrateur, quotas, e
 - [x] Les 4 erreurs (délai, panne, crédit épuisé, réponse inexploitable) se provoquent depuis le réglage admin et affichent chacune leur message, sans stack trace, saisie conservée.
 - [x] Le tableau de bord admin montre les totaux de coût et d'appels par jour et par utilisateur.
 - [x] Les tests n'appellent jamais le vrai modèle (faux fournisseur, `Http::fake`).
-- [ ] La clé OpenRouter n'est ni dans le dépôt ni dans le navigateur.
-- [ ] En production : un vrai appel réussi apparaît dans le tableau de bord avec son coût.
+- [x] La clé OpenRouter n'est ni dans le dépôt ni dans le navigateur.
+- [x] En production : un vrai appel réussi apparaît dans le tableau de bord avec son coût.
 
 ## Journal du ticket
 
@@ -34,3 +34,4 @@ La revue n°1 du 24 novembre attend « tableau de bord administrateur, quotas, e
 - 2026-11-23 : lot 1 (rôles) fait par un sous-agent, relu et vérifié : colonnes `role` et `tier` (enums, non modifiables par formulaire), Gate `admin`, `routes/admin.php` (`auth` + `can:admin`), page `admin/Index`, commande `app:make-admin`, lien « Administration ». 12 tests ajoutés ; `composer ci:check` vert (66 tests), build OK ; essai réel : page admin visible pour un admin, 403 et lien caché après `--revoke`.
 - 2026-11-23 : lot 2 (service IA) fait par un sous-agent, relu et vérifié : `app/Ai/` (interface, OpenRouter avec `zdr`, faux fournisseur et ses 4 erreurs, `AiGateway`), tables `ai_calls` et `settings`, quota par palier avant l'appel, `Http::preventStrayRequests()` pour tous les tests. 33 tests ajoutés ; `composer ci:check` vert (99 tests), build OK. D-003 (Mistral Small 3.2, clé plafonnée à 0,50 €) et `references/ia.md` écrits. Non vérifié : un vrai appel OpenRouter (format de `usage.cost`, acceptation de `zdr`), à voir en production.
 - 2026-11-23 : lot 3 (écrans) fait par un sous-agent, relu et vérifié : atelier promo (`/promo`, badge « Généré par IA », quota restant, erreurs en français, saisie conservée), tableau de bord admin des coûts (`/admin` : totaux sur 30 jours, par jour, par utilisateur, derniers appels, agrégats SQL), réglages IA et palier (`/admin/settings`). 38 tests ajoutés ; `composer ci:check` vert (125 tests), build OK. Essai réel en local dans le navigateur : promo générée avec le badge ; les 4 erreurs provoquées depuis les réglages, chacune avec son message et la saisie conservée ; tableau de bord avec 10 appels dont 8 échecs bien libellés ; refus de quota au 11e appel. Point relevé : les appels en échec (non payés) comptent dans le quota, à revoir. Restent : clé et admin en production (Julien), vrai appel en production.
+- 2026-11-23 : mis en production (PR #9, #10, #11, déploiements verts). Julien a mis la clé dans le `.env` du VPS, créé son compte et s'est nommé admin, palier Pro. Vérifié : un vrai appel OpenRouter réussi (Mistral Small 3.2, 195/280 jetons, 0,0000706 $, 4,3 s, `zdr` accepté, aucune erreur dans les logs) et journalisé ; un échec « délai dépassé » simulé journalisé ; la clé n'apparaît ni dans le dépôt (historique compris) ni dans les pages envoyées au navigateur. Ticket terminé.

@@ -75,6 +75,7 @@ Ce skill décrit la stack de WrestlingStory et la façon dont le groupe veut qu'
 - **Changer `DB_PASSWORD` ne change pas le mot de passe de la base Docker** : il n'est lu qu'à la création du volume, comme `init.sql`. Pour repartir de zéro (données perdues) : `docker compose down -v`, puis `docker compose up -d`.
 - **La CI échoue sur `npm ci` (« package.json and package-lock.json … in sync »)** : le lock commité n'est plus à jour. Lancer `npm install`, vérifier le diff du lock et le commiter ; ne pas annuler ce diff en le prenant pour du bruit.
 - **Revenir à la version précédente en production** : sur le VPS, `ln -sfn /var/www/wrestlingstory/releases/<version-précédente> /var/www/wrestlingstory/current` puis `sudo systemctl reload php8.4-fpm`. Les migrations ne sont pas annulées : une migration doit rester compatible avec la version d'avant.
+- **« Could not open input file: artisan » sur le VPS alors qu'on est dans `/var/www/wrestlingstory/current`** : le terminal était entré dans `current` avant un déploiement ; il est resté dans l'ancienne version, supprimée depuis par le nettoyage. Refaire `cd /var/www/wrestlingstory/current`.
 - **`php` ou `composer` introuvable juste après l'installation** : le PATH n'est relu qu'au démarrage. Fermer et rouvrir le terminal ou l'application.
 
 ## Quel fichier lire, et quand
