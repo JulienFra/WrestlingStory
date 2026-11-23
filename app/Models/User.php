@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Enums\Tier;
+use App\Enums\UserRole;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
@@ -22,6 +24,8 @@ use Laravel\Fortify\PasskeyAuthenticatable;
  * @property string|null $two_factor_recovery_codes
  * @property Carbon|null $two_factor_confirmed_at
  * @property string|null $remember_token
+ * @property UserRole $role
+ * @property Tier $tier
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  */
@@ -33,6 +37,17 @@ class User extends Authenticatable implements PasskeyUser
     use HasFactory, Notifiable, PasskeyAuthenticatable;
 
     /**
+     * Same defaults as the database, so a user created in this request already has them.
+     * role and tier are not fillable: only the server changes them (see app:make-admin).
+     *
+     * @var array<string, string>
+     */
+    protected $attributes = [
+        'role' => 'user',
+        'tier' => 'free',
+    ];
+
+    /**
      * Get the attributes that should be cast.
      *
      * @return array<string, string>
@@ -42,6 +57,13 @@ class User extends Authenticatable implements PasskeyUser
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'role' => UserRole::class,
+            'tier' => Tier::class,
         ];
+    }
+
+    public function isAdmin(): bool
+    {
+        return $this->role === UserRole::Admin;
     }
 }
