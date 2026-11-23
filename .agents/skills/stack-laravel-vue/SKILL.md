@@ -84,4 +84,4 @@ Ce skill décrit la stack de WrestlingStory et la façon dont le groupe veut qu'
 | Tu dois… | Lis |
 | --- | --- |
 | écrire un écran | une page voisine dans `resources/js/pages/` |
-| appeler le modèle | `references/ia.md` (à écrire avec le service IA) |
+| appeler le modèle | `references/ia.md` |
