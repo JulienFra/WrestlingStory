@@ -21,4 +21,17 @@ enum AiErrorKind: string
             self::InvalidResponse => 'La réponse de l\'IA était inutilisable. Réessaie ou reformule ta demande.',
         };
     }
+
+    /**
+     * A short name for the admin dashboard.
+     */
+    public function label(): string
+    {
+        return match ($this) {
+            self::Timeout => 'Délai dépassé',
+            self::ProviderDown => 'Fournisseur en panne',
+            self::CreditExhausted => 'Crédit épuisé',
+            self::InvalidResponse => 'Réponse inexploitable',
+        };
+    }
 }

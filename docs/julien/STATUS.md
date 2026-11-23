@@ -8,7 +8,7 @@ WrestlingStory est en ligne sur https://wrestlingstory.82-25-58-90.sslip.io (HTT
 
 | Ticket | Sujet | Statut |
 | --- | --- | --- |
-| JF-003 | Service IA, journal, quotas, erreurs, tableau de bord admin (revue n°1) | en cours (lots 1 et 2 en PR, lot 3 à faire) |
+| JF-003 | Service IA, journal, quotas, erreurs, tableau de bord admin (revue n°1) | en cours (lots 1 à 3 en PR, mise en production à faire) |
 
 ## Prochaine action
 
