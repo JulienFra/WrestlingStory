@@ -20,10 +20,10 @@ La revue n°1 du 24 novembre attend « tableau de bord administrateur, quotas, e
 ## Critères d'acceptation
 
 - [x] Un utilisateur qui n'est pas admin reçoit 403 sur chaque route admin (vérifié par des tests, pas seulement par l'écran).
-- [ ] Chaque appel au modèle, réussi ou non, crée une ligne dans `ai_calls` avec date, utilisateur, modèle, jetons, coût, durée et succès.
-- [ ] Le quota du jour est vérifié avant l'appel : au-delà, aucun appel n'est fait et un message en français s'affiche.
-- [ ] Les 4 erreurs (délai, panne, crédit épuisé, réponse inexploitable) se provoquent depuis le réglage admin et affichent chacune leur message, sans stack trace, saisie conservée.
-- [ ] Le tableau de bord admin montre les totaux de coût et d'appels par jour et par utilisateur.
+- [x] Chaque appel au modèle, réussi ou non, crée une ligne dans `ai_calls` avec date, utilisateur, modèle, jetons, coût, durée et succès.
+- [x] Le quota du jour est vérifié avant l'appel : au-delà, aucun appel n'est fait et un message en français s'affiche.
+- [x] Les 4 erreurs (délai, panne, crédit épuisé, réponse inexploitable) se provoquent depuis le réglage admin et affichent chacune leur message, sans stack trace, saisie conservée.
+- [x] Le tableau de bord admin montre les totaux de coût et d'appels par jour et par utilisateur.
 - [x] Les tests n'appellent jamais le vrai modèle (faux fournisseur, `Http::fake`).
 - [ ] La clé OpenRouter n'est ni dans le dépôt ni dans le navigateur.
 - [ ] En production : un vrai appel réussi apparaît dans le tableau de bord avec son coût.
@@ -33,3 +33,4 @@ La revue n°1 du 24 novembre attend « tableau de bord administrateur, quotas, e
 - 2026-11-23 : créé, découpage proposé à Julien.
 - 2026-11-23 : lot 1 (rôles) fait par un sous-agent, relu et vérifié : colonnes `role` et `tier` (enums, non modifiables par formulaire), Gate `admin`, `routes/admin.php` (`auth` + `can:admin`), page `admin/Index`, commande `app:make-admin`, lien « Administration ». 12 tests ajoutés ; `composer ci:check` vert (66 tests), build OK ; essai réel : page admin visible pour un admin, 403 et lien caché après `--revoke`.
 - 2026-11-23 : lot 2 (service IA) fait par un sous-agent, relu et vérifié : `app/Ai/` (interface, OpenRouter avec `zdr`, faux fournisseur et ses 4 erreurs, `AiGateway`), tables `ai_calls` et `settings`, quota par palier avant l'appel, `Http::preventStrayRequests()` pour tous les tests. 33 tests ajoutés ; `composer ci:check` vert (99 tests), build OK. D-003 (Mistral Small 3.2, clé plafonnée à 0,50 €) et `references/ia.md` écrits. Non vérifié : un vrai appel OpenRouter (format de `usage.cost`, acceptation de `zdr`), à voir en production.
+- 2026-11-23 : lot 3 (écrans) fait par un sous-agent, relu et vérifié : atelier promo (`/promo`, badge « Généré par IA », quota restant, erreurs en français, saisie conservée), tableau de bord admin des coûts (`/admin` : totaux sur 30 jours, par jour, par utilisateur, derniers appels, agrégats SQL), réglages IA et palier (`/admin/settings`). 38 tests ajoutés ; `composer ci:check` vert (125 tests), build OK. Essai réel en local dans le navigateur : promo générée avec le badge ; les 4 erreurs provoquées depuis les réglages, chacune avec son message et la saisie conservée ; tableau de bord avec 10 appels dont 8 échecs bien libellés ; refus de quota au 11e appel. Point relevé : les appels en échec (non payés) comptent dans le quota, à revoir. Restent : clé et admin en production (Julien), vrai appel en production.

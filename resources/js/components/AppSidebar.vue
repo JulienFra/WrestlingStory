@@ -1,6 +1,13 @@
 <script setup lang="ts">
 import { Link, usePage } from '@inertiajs/vue3';
-import { BookOpen, FolderGit2, LayoutGrid, Shield } from '@lucide/vue';
+import {
+    BookOpen,
+    FolderGit2,
+    LayoutGrid,
+    Mic,
+    Settings2,
+    Shield,
+} from '@lucide/vue';
 import { computed } from 'vue';
 import AppLogo from '@/components/AppLogo.vue';
 import NavFooter from '@/components/NavFooter.vue';
@@ -17,6 +24,8 @@ import {
 } from '@/components/ui/sidebar';
 import { dashboard } from '@/routes';
 import { index as adminIndex } from '@/routes/admin';
+import { edit as adminSettingsEdit } from '@/routes/admin/settings';
+import { create as promoCreate } from '@/routes/promo';
 import type { NavItem } from '@/types';
 
 const page = usePage();
@@ -27,8 +36,20 @@ const mainNavItems = computed<NavItem[]>(() => [
         href: dashboard(),
         icon: LayoutGrid,
     },
+    {
+        title: 'Atelier promo',
+        href: promoCreate(),
+        icon: Mic,
+    },
     ...(page.props.auth.isAdmin
-        ? [{ title: 'Administration', href: adminIndex(), icon: Shield }]
+        ? [
+              { title: 'Administration', href: adminIndex(), icon: Shield },
+              {
+                  title: 'Réglages IA',
+                  href: adminSettingsEdit(),
+                  icon: Settings2,
+              },
+          ]
         : []),
 ]);
 
