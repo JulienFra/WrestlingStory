@@ -63,6 +63,44 @@ class DatabaseConstraintsTest extends TestCase
         $this->assertSame(2, $title->reigns()->count());
     }
 
+    public function test_wrestler_cannot_have_two_active_rivalries_on_either_side()
+    {
+        $rivalry = Rivalry::factory()->create();
+        $newcomer = Wrestler::factory()->create(['federation_id' => $rivalry->federation_id]);
+
+        $this->expectException(QueryException::class);
+
+        // The wrestler on side A of the first rivalry comes back on side B.
+        Rivalry::factory()->create([
+            'federation_id' => $rivalry->federation_id,
+            'wrestler_a_id' => $newcomer->id,
+            'wrestler_b_id' => $rivalry->wrestler_a_id,
+        ]);
+    }
+
+    public function test_ended_rivalry_frees_its_wrestlers()
+    {
+        $ended = Rivalry::factory()->ended()->create();
+
+        $again = Rivalry::factory()->create([
+            'federation_id' => $ended->federation_id,
+            'wrestler_a_id' => $ended->wrestler_b_id,
+            'wrestler_b_id' => $ended->wrestler_a_id,
+        ]);
+
+        $this->assertModelExists($again);
+    }
+
+    public function test_deleting_a_title_keeps_its_rivalry_without_title()
+    {
+        $title = Title::factory()->create();
+        $rivalry = Rivalry::factory()->create(['federation_id' => $title->federation_id, 'title_id' => $title->id]);
+
+        $title->delete();
+
+        $this->assertNull($rivalry->fresh()?->title_id);
+    }
+
     public function test_database_rejects_reign_ending_before_it_starts()
     {
         $this->expectException(QueryException::class);

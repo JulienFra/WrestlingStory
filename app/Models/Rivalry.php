@@ -11,19 +11,21 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Carbon;
 
 /**
- * A feud between two different wrestlers of the same federation. Intensity goes from 0 to 100.
- * The database checks the two wrestlers differ; that both belong to the federation is up to the code.
+ * A feud between two different wrestlers of the same federation, optionally for a title. Intensity goes from 0 to 100.
+ * The database checks the two wrestlers differ and that a wrestler has at most one active rivalry;
+ * that the wrestlers and the title belong to the federation is up to the code.
  *
  * @property int $id
  * @property int $federation_id
  * @property int $wrestler_a_id
  * @property int $wrestler_b_id
+ * @property int|null $title_id
  * @property int $intensity
  * @property RivalryStatus $status
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  */
-#[Fillable(['wrestler_a_id', 'wrestler_b_id', 'intensity', 'status'])]
+#[Fillable(['wrestler_a_id', 'wrestler_b_id', 'title_id', 'intensity', 'status'])]
 class Rivalry extends Model
 {
     /** @use HasFactory<RivalryFactory> */
@@ -72,5 +74,15 @@ class Rivalry extends Model
     public function wrestlerB(): BelongsTo
     {
         return $this->belongsTo(Wrestler::class, 'wrestler_b_id');
+    }
+
+    /**
+     * The title at stake, or null.
+     *
+     * @return BelongsTo<Title, $this>
+     */
+    public function title(): BelongsTo
+    {
+        return $this->belongsTo(Title::class);
     }
 }

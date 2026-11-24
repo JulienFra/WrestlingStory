@@ -15,6 +15,8 @@ Premier écran du jeu : le joueur crée sa fédération. Le palier limite leur n
 - [ ] Un joueur crée une fédération depuis un formulaire et la retrouve dans sa liste.
 - [ ] Un joueur free qui a déjà 1 fédération ne peut pas en créer une deuxième (refus côté serveur, message en français) ; un joueur pro est bloqué à 10.
 - [ ] Les limites sont dans la config (`config/game.php` ou équivalent), pas codées en dur dans le contrôleur.
+- [ ] Un joueur repassé en free garde ses fédérations mais n'en crée plus tant qu'il en a au moins une (D-004).
+- [ ] Supprimer une fédération demande une confirmation et supprime tout son contenu (D-004).
 - [ ] Un joueur reçoit 403 sur la fédération d'un autre (Policy, vérifié par un test).
 - [ ] L'écran est utilisable sur téléphone.
 

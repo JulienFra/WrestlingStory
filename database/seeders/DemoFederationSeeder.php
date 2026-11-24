@@ -49,6 +49,7 @@ class DemoFederationSeeder extends Seeder
         $federation->rivalries()->create([
             'wrestler_a_id' => $wrestlers['Le Baron de Roubaix']->id,
             'wrestler_b_id' => $wrestlers['Marius Tonnerre']->id,
+            'title_id' => $heavyweight->id,
             'intensity' => 75,
         ]);
         $federation->rivalries()->create([

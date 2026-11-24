@@ -16,7 +16,9 @@ Les titres et les rivalités donnent de l'enjeu aux matchs de Julien (le main ev
 - [ ] Le joueur crée une rivalité entre deux catcheurs différents de sa fédération ; un catcheur d'une autre fédération est refusé (testé).
 - [ ] Le joueur peut clore une rivalité.
 - [ ] Le code vérifie que les catcheurs d'une rivalité et le champion d'un titre sont dans la même fédération (la base ne le vérifie pas, voir FL-001).
-- [ ] Deux rivalités actives sur la même paire (A contre B ou B contre A) sont refusées.
+- [ ] Un catcheur déjà dans une rivalité en cours ne peut pas en commencer une autre (D-004) : message en français, en plus de la contrainte en base de FL-001.
+- [ ] Le titre d'une rivalité, s'il y en a un, est de la même fédération.
+- [ ] « Terminer la rivalité » est la seule façon de clore une rivalité (D-004).
 - [ ] Changer de champion ferme l'ancien règne puis ouvre le nouveau, dans une transaction (la base refuse deux règnes ouverts).
 - [ ] Les règles (changer de champion) vivent dans `app/Game/`, testables sans HTTP.
 - [ ] Les écrans sont utilisables sur téléphone.

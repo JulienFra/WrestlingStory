@@ -20,11 +20,12 @@ Exigence O2 : au moins quatre entités métier reliées, avec intégrité, valid
 
 ## Critères d'acceptation
 
-- [ ] Les 5 tables existent avec leurs clés étrangères, et `php artisan migrate:fresh --seed` passe sur PostgreSQL.
+- [x] Les 5 tables existent avec leurs clés étrangères, et `php artisan migrate:fresh --seed` passe sur PostgreSQL.
 - [x] La base refuse une stat hors de 0 à 100, une rivalité d'un catcheur contre lui-même et un second règne ouvert sur le même titre (vérifié par des tests).
 - [x] Supprimer un utilisateur supprime ses fédérations et tout leur contenu.
 - [x] Chaque modèle a ses relations et sa factory ; le seeder crée une fédération de démo entièrement fictive (aucun vrai catcheur ni vraie marque).
-- [ ] `npm run build` puis `composer ci:check` sont verts.
+- [x] `npm run build` puis `composer ci:check` sont verts.
+- [x] D-004 : une rivalité a un titre facultatif (`title_id`) et un catcheur n'a qu'une rivalité en cours, refusé par la base même sur un double clic (testé).
 
 ## Questions ouvertes (avec Julien)
 
@@ -35,3 +36,4 @@ Exigence O2 : au moins quatre entités métier reliées, avec intégrité, valid
 
 - 2026-11-24 : créé, découpage validé par Florentin.
 - 2026-11-24 : lot 1 fait par un sous-agent (5 migrations, 3 enums, 5 modèles, factories, `DemoFederationSeeder`, 11 tests dans `tests/Feature/Domain/`), relu. Revérifié par l'agent principal : 11 tests du domaine verts, Larastan 0 erreur, Pint vert. Le sous-agent rapporte `migrate:fresh --seed` réussi en local (pas revu : il efface la base locale). Suite complète pas encore verte en local : 21 tests de pages échouent tant que `composer dev` tourne (`public/hot`), à relancer serveur arrêté.
+- 2026-11-24 : `main` (D-004) fusionnée dans la branche. Schéma adapté : `rivalries.title_id` facultatif (null si le titre est supprimé) et contrainte d'exclusion (extension `intarray`) : un catcheur n'a qu'une rivalité active, de quelque côté qu'il soit. 3 tests en plus. `public/hot` resté après l'arrêt de `composer dev`, supprimé. Vérifié : `npm run build` OK, `composer ci:check` vert (Pint, oxlint, vue-tsc, Larastan 0 erreur, 136 tests passés et 3 ignorés sur 139), `migrate:fresh --seed` OK sur la base de test puis sur la base locale. `main_events` reste à ajouter par Julien (D-004).

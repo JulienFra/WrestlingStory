@@ -8,16 +8,23 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration
 {
     /**
-     * A feud between two wrestlers of the same federation. Intensity goes from 0 to 100.
+     * A feud between two wrestlers of the same federation, optionally for a title (D-004). Intensity goes from 0 to 100.
      * status: "active" or "ended" (App\Enums\RivalryStatus). A wrestler cannot feud with themselves.
+     * A wrestler has at most one active rivalry, whichever side they are on: an exclusion constraint
+     * refuses two active rivalries whose pairs of wrestlers overlap, even on a double click.
+     * It needs the intarray extension (shipped with PostgreSQL, trusted: no superuser needed).
      */
     public function up(): void
     {
+        DB::statement('CREATE EXTENSION IF NOT EXISTS intarray');
+
         Schema::create('rivalries', function (Blueprint $table) {
             $table->id();
             $table->foreignId('federation_id')->constrained()->cascadeOnDelete();
             $table->foreignId('wrestler_a_id')->constrained('wrestlers')->cascadeOnDelete();
             $table->foreignId('wrestler_b_id')->constrained('wrestlers')->cascadeOnDelete();
+            // Deleting the title keeps the rivalry, without a title.
+            $table->foreignId('title_id')->nullable()->constrained()->nullOnDelete();
             $table->unsignedSmallInteger('intensity')->default(50);
             $table->string('status')->default('active');
             $table->timestamps();
@@ -26,6 +33,8 @@ return new class extends Migration
         DB::statement('ALTER TABLE rivalries ADD CONSTRAINT rivalries_intensity_check CHECK (intensity BETWEEN 0 AND 100)');
         DB::statement("ALTER TABLE rivalries ADD CONSTRAINT rivalries_status_check CHECK (status IN ('active', 'ended'))");
         DB::statement('ALTER TABLE rivalries ADD CONSTRAINT rivalries_two_different_wrestlers_check CHECK (wrestler_a_id <> wrestler_b_id)');
+        DB::statement('ALTER TABLE rivalries ADD CONSTRAINT rivalries_one_active_rivalry_per_wrestler '
+            ."EXCLUDE USING gist ((ARRAY[wrestler_a_id::int, wrestler_b_id::int]) gist__int_ops WITH &&) WHERE (status = 'active')");
     }
 
     public function down(): void

@@ -2,7 +2,7 @@
 
 ## Où j'en suis
 
-Le poste est installé (PHP 8.4.28, Composer, gh connecté). Brainstorm avec Julien : je fais fédérations, catcheurs, titres, rivalités et le dashboard de la fédération ; Julien fait le main event et la narration IA. FL-001 (schéma) est codé sur `feature/fl-001-schema`, pas encore commité : 11 tests du domaine verts, suite complète à relancer `composer dev` arrêté.
+Le poste est installé (PHP 8.4.28, Composer, gh connecté). Brainstorm avec Julien : je fais fédérations, catcheurs, titres, rivalités et le dashboard de la fédération ; Julien fait le main event et la narration IA. D-004 (règles du jeu, Julien) est fusionnée et intégrée : FL-001 (schéma) est poussé sur `feature/fl-001-schema` avec sa PR, `composer ci:check` vert en local.
 
 ## Tickets ouverts
 
@@ -16,6 +16,6 @@ Le poste est installé (PHP 8.4.28, Composer, gh connecté). Brainstorm avec Jul
 
 ## Prochaine action
 
-1. Arrêter `composer dev`, puis `npm run build` et `composer ci:check` : la suite complète doit être verte.
-2. Commit sur `feature/fl-001-schema` et PR ; demander à Julien s'il ajoute ses tables (shows, segments, matchs) dans cette PR et quelles colonnes son moteur attend.
-3. Ensuite FL-002 (nouvelle branche depuis `main` après la fusion de FL-001).
+1. Regarder la CI de la PR FL-001 ; Julien y ajoute `main_events` (D-004), relit et fusionne.
+2. Ensuite FL-002 (nouvelle branche depuis `main` après la fusion de FL-001).
+3. Le compte créé en local a été effacé par `migrate:fresh` : se réinscrire, puis `php artisan app:make-admin <email>`.
