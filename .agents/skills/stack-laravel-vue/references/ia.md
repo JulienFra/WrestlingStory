@@ -22,13 +22,32 @@ try {
 }
 ```
 
+## Une réponse en JSON
+
+Pour une réponse structurée (le main event), `completeJson` impose un schéma JSON au modèle (`response_format: json_schema`, `strict`, et `provider.require_parameters` pour n'aller que chez un fournisseur qui le respecte). Il rend un `AiJsonCompletion` : l'objet décodé (`data`) et l'id de la ligne `ai_calls` (`aiCallId`).
+
+```php
+$result = app(AiGateway::class)->completeJson(
+    user: $request->user(),
+    feature: 'main_event',
+    system: $systemPrompt,
+    prompt: $compactState,        // l'état compact du match : jamais d'e-mail, de pseudo ni d'id d'utilisateur
+    maxTokens: 700,
+    schemaName: 'main_event',
+    schema: $schema,              // strict : additionalProperties false, toutes les propriétés dans required
+    isUsable: fn (array $data) => /* types, bornes, vainqueur parmi les deux… */ true,
+);
+```
+
+Une réponse qui n'est pas un objet JSON, ou que `isUsable` refuse, devient « réponse inexploitable » (O5) ; ses jetons sont quand même journalisés. Le faux fournisseur construit une réponse à partir du schéma : la première valeur d'un `enum`, sinon `minimum`, sinon un texte fictif.
+
 ## Les pièces
 
 | Fichier | Rôle |
 | --- | --- |
-| `app/Ai/AiClient.php` | l'interface : `complete(system, prompt, maxTokens): AiCompletion` |
+| `app/Ai/AiClient.php` | l'interface : `complete(system, prompt, maxTokens, ?AiJsonSchema): AiCompletion` |
 | `app/Ai/OpenRouterClient.php` | le vrai fournisseur : clé `OPENROUTER_API_KEY`, `provider: { zdr: true, data_collection: deny }`, coût lu dans `usage.cost` |
-| `app/Ai/FakeAiClient.php` | le faux fournisseur : réponse fixe, ou une des 4 erreurs |
+| `app/Ai/FakeAiClient.php` | le faux fournisseur : réponse fixe (ou construite depuis le schéma JSON), ou une des 4 erreurs |
 | `app/Ai/AiProvider.php` | le fournisseur courant : réglage admin `Setting::get('ai.provider')`, sinon `AI_PROVIDER` |
 | `app/Ai/AiErrorKind.php` | les 4 erreurs d'O5 et leur message en français |
 | `config/ai.php` | modèle, délai, quotas par palier (`free` : 10 appels par jour, `pro` : 100) |

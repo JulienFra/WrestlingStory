@@ -31,6 +31,7 @@ use Illuminate\Support\Carbon;
  * @property string|null $story
  * @property string|null $follow_up
  * @property Carbon|null $played_at
+ * @property int|null $ai_call_id
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  */
@@ -118,5 +119,15 @@ class MainEvent extends Model
     public function winner(): BelongsTo
     {
         return $this->belongsTo(Wrestler::class, 'winner_id');
+    }
+
+    /**
+     * The ai_calls row of the call that told the match, or null.
+     *
+     * @return BelongsTo<AiCall, $this>
+     */
+    public function aiCall(): BelongsTo
+    {
+        return $this->belongsTo(AiCall::class);
     }
 }

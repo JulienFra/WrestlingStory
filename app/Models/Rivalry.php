@@ -22,10 +22,11 @@ use Illuminate\Support\Carbon;
  * @property int|null $title_id
  * @property int $intensity
  * @property RivalryStatus $status
+ * @property Carbon|null $ended_at
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  */
-#[Fillable(['wrestler_a_id', 'wrestler_b_id', 'title_id', 'intensity', 'status'])]
+#[Fillable(['wrestler_a_id', 'wrestler_b_id', 'title_id', 'intensity', 'status', 'ended_at'])]
 class Rivalry extends Model
 {
     /** @use HasFactory<RivalryFactory> */
@@ -49,6 +50,7 @@ class Rivalry extends Model
         return [
             'intensity' => 'integer',
             'status' => RivalryStatus::class,
+            'ended_at' => 'datetime',
         ];
     }
 
