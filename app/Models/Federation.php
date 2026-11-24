@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Database\Factories\FederationFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -17,10 +18,12 @@ use Illuminate\Support\Carbon;
  * @property int $user_id
  * @property string $name
  * @property string|null $description
+ * @property string|null $public_token the secret of the public page, null when the link is off
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  */
 #[Fillable(['name', 'description'])]
+#[Hidden(['public_token'])]
 class Federation extends Model
 {
     /** @use HasFactory<FederationFactory> */

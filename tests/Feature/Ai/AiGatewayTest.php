@@ -7,6 +7,7 @@ use App\Ai\AiCompletion;
 use App\Ai\AiErrorKind;
 use App\Ai\AiException;
 use App\Ai\AiGateway;
+use App\Ai\AiJsonSchema;
 use App\Ai\AiProvider;
 use App\Ai\FakeAiClient;
 use App\Ai\QuotaExceededException;
@@ -46,7 +47,7 @@ class AiGatewayTest extends TestCase
 
             public function __construct(private string $text) {}
 
-            public function complete(string $system, string $prompt, int $maxTokens): AiCompletion
+            public function complete(string $system, string $prompt, int $maxTokens, ?AiJsonSchema $jsonSchema = null): AiCompletion
             {
                 $this->calls++;
 
