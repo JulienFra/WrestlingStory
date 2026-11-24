@@ -75,4 +75,12 @@ class User extends Authenticatable implements PasskeyUser
     {
         return $this->hasMany(AiCall::class);
     }
+
+    /**
+     * @return HasMany<Federation, $this>
+     */
+    public function federations(): HasMany
+    {
+        return $this->hasMany(Federation::class);
+    }
 }

@@ -1,0 +1,37 @@
+---
+id: FL-001
+titre: Schéma du domaine (fédérations, catcheurs, titres, règnes, rivalités)
+statut: en cours          # ouvert | en cours | bloqué | terminé | abandonné
+branche: feature/fl-001-schema
+créé: 2026-11-24
+mis-à-jour: 2026-11-24
+---
+## Contexte
+
+Exigence O2 : au moins quatre entités métier reliées, avec intégrité, validation et données de démo. Brainstorm du 2026-11-24 avec Julien : Florentin crée les fédérations, catcheurs, titres et rivalités ; Julien construit le main event et la narration IA (O1) dessus, avec ses propres tables (shows, segments, matchs). `AGENTS.md` dit que le schéma s'écrit à deux, en une PR : cette PR est ouverte par Florentin, Julien y ajoute ou relit ses tables (à confirmer avec lui).
+
+## Données
+
+- `federations` : `user_id` (suppression en cascade), `name` (unique par joueur), `description` facultative.
+- `wrestlers` : `federation_id`, `ring_name` (unique dans la fédération), `gimmick`, `alignment` (`face` ou `heel`), `power`, `technique`, `charisma`, `stamina`, `popularity` (entiers 0 à 100), `status` (`active` ou `injured`).
+- `titles` : `federation_id`, `name` (unique dans la fédération), `prestige` (0 à 100).
+- `title_reigns` : `title_id`, `wrestler_id`, `started_at`, `ended_at` facultatif ; au plus un règne ouvert par titre.
+- `rivalries` : `federation_id`, `wrestler_a_id`, `wrestler_b_id` (différents), `intensity` (0 à 100), `status` (`active` ou `ended`).
+
+## Critères d'acceptation
+
+- [ ] Les 5 tables existent avec leurs clés étrangères, et `php artisan migrate:fresh --seed` passe sur PostgreSQL.
+- [x] La base refuse une stat hors de 0 à 100, une rivalité d'un catcheur contre lui-même et un second règne ouvert sur le même titre (vérifié par des tests).
+- [x] Supprimer un utilisateur supprime ses fédérations et tout leur contenu.
+- [x] Chaque modèle a ses relations et sa factory ; le seeder crée une fédération de démo entièrement fictive (aucun vrai catcheur ni vraie marque).
+- [ ] `npm run build` puis `composer ci:check` sont verts.
+
+## Questions ouvertes (avec Julien)
+
+- Julien ajoute-t-il ses tables (shows, segments, matchs) dans cette même PR ?
+- Quelles colonnes son moteur attend-il en plus (argent, audience de la fédération, moral d'un catcheur…) ?
+
+## Journal du ticket
+
+- 2026-11-24 : créé, découpage validé par Florentin.
+- 2026-11-24 : lot 1 fait par un sous-agent (5 migrations, 3 enums, 5 modèles, factories, `DemoFederationSeeder`, 11 tests dans `tests/Feature/Domain/`), relu. Revérifié par l'agent principal : 11 tests du domaine verts, Larastan 0 erreur, Pint vert. Le sous-agent rapporte `migrate:fresh --seed` réussi en local (pas revu : il efface la base locale). Suite complète pas encore verte en local : 21 tests de pages échouent tant que `composer dev` tourne (`public/hot`), à relancer serveur arrêté.
