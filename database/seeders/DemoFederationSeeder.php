@@ -3,12 +3,16 @@
 namespace Database\Seeders;
 
 use App\Enums\Alignment;
+use App\Enums\MainEventStatus;
+use App\Enums\MainEventType;
 use App\Models\Federation;
 use App\Models\User;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Carbon;
 
 /**
- * A fictional demo federation for the test user: 8 invented wrestlers, 2 titles (one with a champion), 2 active rivalries.
+ * A fictional demo federation for the test user: 8 invented wrestlers, 2 titles (one with a champion),
+ * 2 active rivalries, a title match coming up and a match already played.
  * Nothing real: no real promotion, no real wrestler.
  */
 class DemoFederationSeeder extends Seeder
@@ -46,7 +50,7 @@ class DemoFederationSeeder extends Seeder
             'started_at' => now()->subWeeks(6),
         ]);
 
-        $federation->rivalries()->create([
+        $titleFeud = $federation->rivalries()->create([
             'wrestler_a_id' => $wrestlers['Le Baron de Roubaix']->id,
             'wrestler_b_id' => $wrestlers['Marius Tonnerre']->id,
             'title_id' => $heavyweight->id,
@@ -57,6 +61,30 @@ class DemoFederationSeeder extends Seeder
             'wrestler_b_id' => $wrestlers['Docteur Brouillard']->id,
             'intensity' => 55,
         ]);
+
+        // Coming up next Saturday: the title match of the rivalry.
+        $federation->mainEvents()->create([
+            'type' => MainEventType::Rivalry,
+            'rivalry_id' => $titleFeud->id,
+            'wrestler_a_id' => $titleFeud->wrestler_a_id,
+            'wrestler_b_id' => $titleFeud->wrestler_b_id,
+            'title_id' => $heavyweight->id,
+            'scheduled_on' => now()->next(Carbon::SATURDAY)->toDateString(),
+        ]);
+
+        // Already played: status, winner and story are written by the game, not by the player (not fillable).
+        $federation->mainEvents()->make([
+            'type' => MainEventType::Simple,
+            'wrestler_a_id' => $wrestlers['Gaston Brique']->id,
+            'wrestler_b_id' => $wrestlers['Fernand Pavé']->id,
+            'scheduled_on' => now()->subWeek()->toDateString(),
+        ])->forceFill([
+            'status' => MainEventStatus::Played,
+            'winner_id' => $wrestlers['Gaston Brique']->id,
+            'story' => 'Dans une salle des fêtes comble, Gaston Brique encaisse trois chaises avant de clouer Fernand Pavé au sol d\'un tombé rageur.',
+            'follow_up' => 'Fernand Pavé pourrait accuser l\'arbitre et réclamer une revanche sans disqualification.',
+            'played_at' => now()->subWeek(),
+        ])->save();
     }
 
     /**

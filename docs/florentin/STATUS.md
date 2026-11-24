@@ -16,6 +16,6 @@ Le poste est installé (PHP 8.4.28, Composer, gh connecté). Brainstorm avec Jul
 
 ## Prochaine action
 
-1. Regarder la CI de la PR FL-001 ; Julien y ajoute `main_events` (D-004), relit et fusionne.
+1. PR #15 (FL-001, les 6 tables de D-004 dont `main_events`) : Julien relit, dit s'il lui faut d'autres colonnes, et fusionne.
 2. Ensuite FL-002 (nouvelle branche depuis `main` après la fusion de FL-001).
 3. Le compte créé en local a été effacé par `migrate:fresh` : se réinscrire, puis `php artisan app:make-admin <email>`.

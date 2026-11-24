@@ -57,4 +57,12 @@ class Federation extends Model
     {
         return $this->hasMany(Rivalry::class);
     }
+
+    /**
+     * @return HasMany<MainEvent, $this>
+     */
+    public function mainEvents(): HasMany
+    {
+        return $this->hasMany(MainEvent::class);
+    }
 }

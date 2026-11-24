@@ -3,6 +3,7 @@
 namespace Tests\Feature\Domain;
 
 use App\Models\Federation;
+use App\Models\MainEvent;
 use App\Models\Rivalry;
 use App\Models\Title;
 use App\Models\TitleReign;
@@ -22,6 +23,7 @@ class FederationTest extends TestCase
         $title = Title::factory()->for($federation)->create();
         TitleReign::factory()->create(['title_id' => $title->id]);
         Rivalry::factory()->for($federation)->create();
+        MainEvent::factory()->played()->for($federation)->create(['title_id' => $title->id]);
 
         $user->delete();
 
@@ -30,6 +32,7 @@ class FederationTest extends TestCase
         $this->assertSame(0, Title::query()->count());
         $this->assertSame(0, TitleReign::query()->count());
         $this->assertSame(0, Rivalry::query()->count());
+        $this->assertSame(0, MainEvent::query()->count());
     }
 
     public function test_title_current_reign_returns_open_reign()

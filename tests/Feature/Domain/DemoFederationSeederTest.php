@@ -2,8 +2,10 @@
 
 namespace Tests\Feature\Domain;
 
+use App\Enums\MainEventStatus;
 use App\Enums\RivalryStatus;
 use App\Models\Federation;
+use App\Models\MainEvent;
 use App\Models\Rivalry;
 use App\Models\Title;
 use App\Models\TitleReign;
@@ -27,5 +29,7 @@ class DemoFederationSeederTest extends TestCase
         $this->assertSame(2, Title::query()->count());
         $this->assertSame(1, TitleReign::query()->whereNull('ended_at')->count());
         $this->assertSame(2, Rivalry::query()->where('status', RivalryStatus::Active)->count());
+        $this->assertSame(1, MainEvent::query()->where('status', MainEventStatus::Scheduled)->count());
+        $this->assertSame(1, MainEvent::query()->where('status', MainEventStatus::Played)->count());
     }
 }
