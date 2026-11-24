@@ -1,15 +1,15 @@
 # WrestlingStory
 
-Un jeu web pour les fans de catch : on dirige une fédération fictive et on écrit le show de la semaine en texte libre ; un modèle de langage raconte chaque segment et propose des effets que l'application borne, applique à l'état de la fédération et transforme en note du show, audience et finances.
+Un jeu web pour les fans de catch : on dirige une fédération fictive et on y crée ses catcheurs, ses titres et ses rivalités, puis on booke des main events qu'un modèle de langage raconte ; l'application vérifie sa réponse, applique les effets à la fédération et la partage par un lien public.
 
 Ce fichier est lu par l'agent de chaque membre du groupe, à chaque session. Gardez-le court. Tout changement passe par une PR.
 
 ## Le produit en bref
 
 - **Projet 2 du cours 5IDEV** (énoncé : https://www.cours.tsix.be/cours/projet-dintegration-de-developpement/projet-2). Remise le 3 janvier 2027, revues le 24 novembre et le 15 décembre.
-- **Flux IA central (O1)** : le joueur écrit un segment → le modèle renvoie une narration et des effets structurés (JSON) → le code valide, borne et applique les effets en base, puis calcule note, audience, finances et classement des rivalités sans appeler le modèle.
+- **Flux IA central (O1)** : le joueur booke un main event (match simple ou de rivalité, titre éventuel, vainqueur imposé ou non) → le modèle renvoie le récit, le vainqueur et une suite logique (JSON) → le code valide, puis applique les effets (popularité, règnes de titre) sans appeler le modèle ; le dashboard et la page publique de la fédération les affichent. Règles du jeu : D-004.
 - **Outil secondaire** : le créateur de catcheur (gimmick → fiche validée dont les stats servent aux matchs).
-- **Entités** : fédérations, catcheurs, titres, règnes, shows, segments, matchs, rivalités.
+- **Entités** : fédérations, catcheurs, titres, règnes, rivalités, main events.
 - **Règle d'or** : la sortie du modèle est une entrée non fiable. Les règles du jeu vivent dans le code, jamais seulement dans le prompt ; chaque effet a un type connu, une cible existante et un delta borné.
 - **Budget** : clé OpenRouter plafonnée à 1 € pour tout le projet. État envoyé au modèle compact, faux fournisseur IA dans les tests.
 - **Rien de réel** : ni WWE, ni logo, ni vrai catcheur, même dans les données de démo.
@@ -18,8 +18,8 @@ Ce fichier est lu par l'agent de chaque membre du groupe, à chaque session. Gar
 
 | Prénom | Nom d'auteur git (`git config user.name`) | Dossier | Travaille sur |
 | --- | --- | --- | --- |
-| Julien | JulienFra | `docs/julien/` | Moteur IA : service OpenRouter et faux fournisseur, booking d'un segment (O1), journal des appels et quotas (O4), erreurs IA (O5), tableau de bord des coûts ; infra VPS et CI/CD |
-| Florentin | Florentin28 | `docs/florentin/` | Comptes et rôles (O3), écrans du domaine (roster, titres, calendrier, contrats, rivalités), créateur de catcheur, landing et pricing (O6), page légale (O7), design |
+| Julien | JulienFra | `docs/julien/` | Moteur IA : service OpenRouter et faux fournisseur, main event (O1 : création, date, lancement, récit IA, vainqueur, effets et règnes), lien public de la fédération (code et routes en lecture seule), journal des appels et quotas (O4), erreurs IA (O5), tableau de bord des coûts, chiffrage du pricing ; infra VPS et CI/CD |
+| Florentin | Florentin28 | `docs/florentin/` | Comptes et rôles (O3), fédérations (création, limite par palier), catcheurs (roster), titres et rivalités, dashboard de la fédération (catcheurs, champions, matchs à venir, rivalités) et habillage de sa page publique, créateur de catcheur, landing et pricing (O6), page légale (O7), design |
 
 Le schéma de données (migrations, modèles, seeders) s'écrit à deux, en une PR. Ensuite on ne modifie pas une migration fusionnée : on en ajoute une.
 

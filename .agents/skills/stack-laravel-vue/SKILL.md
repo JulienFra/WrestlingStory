@@ -34,11 +34,11 @@ Ce skill décrit la stack de WrestlingStory et la façon dont le groupe veut qu'
 - **Où va chaque chose** :
   - validation des entrées : une `FormRequest` dans `app/Http/Requests/`, jamais dans le contrôleur ;
   - droits (« cette fédération est-elle à moi ? ») : une `Policy` par modèle, appelée dans le contrôleur ; le serveur vérifie toujours, l'écran ne suffit pas ;
-  - règle du jeu (appliquer un effet, calculer la note d'un show) : une classe dans `app/Game/`, sans HTTP ni appel au modèle, testable seule ;
+  - règle du jeu (appliquer un effet, changer le champion d'un titre) : une classe dans `app/Game/`, sans HTTP ni appel au modèle, testable seule ;
   - appel au modèle : uniquement dans `app/Ai/`, derrière une interface ; un faux fournisseur la remplace dans les tests.
 - **La sortie du modèle est une entrée non fiable** : on la valide contre un schéma, on vérifie que chaque catcheur, titre ou rivalité cité existe dans la fédération de l'utilisateur, on borne chaque delta, et on refuse le reste. Le modèle ne déclenche jamais une action sans que le code la vérifie.
 - **Chaque appel au modèle passe par le journal** (date, utilisateur, modèle, jetons, coût, durée, succès) et par le contrôle de quota, avant l'appel.
-- **Les noms** : classes et méthodes en anglais (`WrestlerController`, `ApplySegmentEffects`), tables au pluriel (`wrestlers`, `title_reigns`), pages Vue en PascalCase (`pages/roster/Index.vue`), tests qui disent la règle (`test_player_cannot_book_injured_wrestler`).
+- **Les noms** : classes et méthodes en anglais (`WrestlerController`, `ApplyMainEventEffects`), tables au pluriel (`wrestlers`, `title_reigns`), pages Vue en PascalCase (`pages/roster/Index.vue`), tests qui disent la règle (`test_player_cannot_book_injured_wrestler`).
 - **La taille** : une méthode tient sur un écran (40 lignes) ; un composant Vue au-delà de 200 lignes se découpe.
 - **La langue** : code en anglais, textes affichés en français.
 - **Le style** : celui de la documentation Laravel et du starter kit ; pas d'abstraction tant qu'un seul endroit s'en sert.
