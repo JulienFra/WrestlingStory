@@ -5,6 +5,7 @@ namespace Tests\Feature\Promo;
 use App\Ai\AiClient;
 use App\Ai\AiCompletion;
 use App\Ai\AiErrorKind;
+use App\Ai\AiJsonSchema;
 use App\Ai\AiProvider;
 use App\Ai\FakeAiClient;
 use App\Ai\Prompts\PromoPrompt;
@@ -44,7 +45,7 @@ class PromoTest extends TestCase
 
             public string $prompt = '';
 
-            public function complete(string $system, string $prompt, int $maxTokens): AiCompletion
+            public function complete(string $system, string $prompt, int $maxTokens, ?AiJsonSchema $jsonSchema = null): AiCompletion
             {
                 $this->calls++;
                 $this->system = $system;

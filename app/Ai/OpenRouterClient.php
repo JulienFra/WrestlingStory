@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\Log;
  */
 class OpenRouterClient implements AiClient
 {
-    public function complete(string $system, string $prompt, int $maxTokens): AiCompletion
+    public function complete(string $system, string $prompt, int $maxTokens, ?AiJsonSchema $jsonSchema = null): AiCompletion
     {
         $key = config('services.openrouter.key');
 
@@ -24,7 +24,7 @@ class OpenRouterClient implements AiClient
         }
 
         $model = (string) config('ai.model');
-        $response = $this->send($key, $model, $system, $prompt, $maxTokens);
+        $response = $this->send($key, $this->body($model, $system, $prompt, $maxTokens, $jsonSchema));
 
         if ($response->failed()) {
             Log::warning('OpenRouter call failed.', ['status' => $response->status()]);
@@ -36,24 +36,47 @@ class OpenRouterClient implements AiClient
     }
 
     /**
+     * With a JSON Schema, the answer must follow it ("strict"), and OpenRouter only routes the call
+     * to a provider that supports it ("require_parameters"). Without one, the request is a plain chat completion.
+     *
+     * @return array<string, mixed>
+     */
+    private function body(string $model, string $system, string $prompt, int $maxTokens, ?AiJsonSchema $jsonSchema): array
+    {
+        $body = [
+            'model' => $model,
+            'messages' => [
+                ['role' => 'system', 'content' => $system],
+                ['role' => 'user', 'content' => $prompt],
+            ],
+            'max_tokens' => $maxTokens,
+            'provider' => ['zdr' => true, 'data_collection' => 'deny'],
+            'usage' => ['include' => true],
+        ];
+
+        if ($jsonSchema !== null) {
+            $body['response_format'] = [
+                'type' => 'json_schema',
+                'json_schema' => ['name' => $jsonSchema->name, 'strict' => true, 'schema' => $jsonSchema->schema],
+            ];
+            $body['provider']['require_parameters'] = true;
+        }
+
+        return $body;
+    }
+
+    /**
+     * @param  array<string, mixed>  $body
+     *
      * @throws AiException
      */
-    private function send(string $key, string $model, string $system, string $prompt, int $maxTokens): Response
+    private function send(string $key, array $body): Response
     {
         try {
             return Http::withToken($key)
                 ->acceptJson()
                 ->timeout((int) config('ai.timeout'))
-                ->post(rtrim((string) config('services.openrouter.url'), '/').'/chat/completions', [
-                    'model' => $model,
-                    'messages' => [
-                        ['role' => 'system', 'content' => $system],
-                        ['role' => 'user', 'content' => $prompt],
-                    ],
-                    'max_tokens' => $maxTokens,
-                    'provider' => ['zdr' => true, 'data_collection' => 'deny'],
-                    'usage' => ['include' => true],
-                ]);
+                ->post(rtrim((string) config('services.openrouter.url'), '/').'/chat/completions', $body);
         } catch (ConnectionException $exception) {
             $timedOut = str_contains($exception->getMessage(), 'cURL error 28')
                 || str_contains(strtolower($exception->getMessage()), 'timed out');

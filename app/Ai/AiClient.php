@@ -8,7 +8,9 @@ namespace App\Ai;
 interface AiClient
 {
     /**
+     * With a JSON Schema, the answer must be a JSON object that follows it. Without one, plain text.
+     *
      * @throws AiException
      */
-    public function complete(string $system, string $prompt, int $maxTokens): AiCompletion;
+    public function complete(string $system, string $prompt, int $maxTokens, ?AiJsonSchema $jsonSchema = null): AiCompletion;
 }
