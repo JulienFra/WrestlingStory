@@ -5,7 +5,7 @@ description: La stack de WrestlingStory (Laravel 13, Vue 3 via Inertia, PostgreS
 
 # Stack du groupe : Laravel + Vue/Inertia, PostgreSQL, VPS HOSTKEY
 
-Ce skill décrit la stack de WrestlingStory et la façon dont le groupe veut qu'on y travaille. Lis-le en entier avant d'écrire du code. Florentin le lit aussi, sans agent : il doit rester clair pour un humain.
+Ce skill décrit la stack de WrestlingStory et la façon dont le groupe veut qu'on y travaille. Lis-le en entier avant d'écrire du code. Chaque membre le lit, avec ou sans son agent : il doit rester clair pour un humain.
 
 ## Avant de toucher au code
 

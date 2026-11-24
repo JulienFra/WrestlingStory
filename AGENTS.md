@@ -19,11 +19,11 @@ Ce fichier est lu par l'agent de chaque membre du groupe, à chaque session. Gar
 | Prénom | Nom d'auteur git (`git config user.name`) | Dossier | Travaille sur |
 | --- | --- | --- | --- |
 | Julien | JulienFra | `docs/julien/` | Moteur IA : service OpenRouter et faux fournisseur, booking d'un segment (O1), journal des appels et quotas (O4), erreurs IA (O5), tableau de bord des coûts ; infra VPS et CI/CD |
-| Florentin | Florentin28 | aucun (pas d'agent) | Comptes et rôles (O3), écrans du domaine (roster, titres, calendrier, contrats, rivalités), créateur de catcheur, landing et pricing (O6), page légale (O7), design |
+| Florentin | Florentin28 | `docs/florentin/` | Comptes et rôles (O3), écrans du domaine (roster, titres, calendrier, contrats, rivalités), créateur de catcheur, landing et pricing (O6), page légale (O7), design |
 
 Le schéma de données (migrations, modèles, seeders) s'écrit à deux, en une PR. Ensuite on ne modifie pas une migration fusionnée : on en ajoute une.
 
-**Florentin travaille sans agent.** Il n'a pas de dossier dans `docs/` et tu ne lui en crées pas. Pour savoir ce qu'il fait, lis ses branches et ses PR ouvertes, et demande à Julien ce que tu ne trouves pas. Il relit les PR de Julien à la main : le code doit se comprendre sans l'agent (pas d'abstraction gratuite, noms clairs) et chaque PR dit ce qu'elle change et comment la tester.
+**Chacun travaille avec son agent.** Le dossier de Florentin, `docs/florentin/`, est créé par son agent à sa première session (skill `bureaucratie`, « mets en place ma bureaucratie »). Chacun relit les PR de l'autre, souvent à la main : le code doit se comprendre sans l'agent (pas d'abstraction gratuite, noms clairs) et chaque PR dit ce qu'elle change et comment la tester.
 
 Tu travailles pour **une seule personne** : celle dont le nom d'auteur git est celui de cette machine. Lance `git config user.name` et retrouve sa ligne. Si aucune ligne ne correspond, demande son prénom avant tout.
 
