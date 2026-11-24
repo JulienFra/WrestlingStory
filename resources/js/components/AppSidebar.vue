@@ -7,6 +7,7 @@ import {
     Mic,
     Settings2,
     Shield,
+    Trophy,
 } from '@lucide/vue';
 import { computed } from 'vue';
 import AppLogo from '@/components/AppLogo.vue';
@@ -25,6 +26,7 @@ import {
 import { dashboard } from '@/routes';
 import { index as adminIndex } from '@/routes/admin';
 import { edit as adminSettingsEdit } from '@/routes/admin/settings';
+import { index as federationsIndex } from '@/routes/federations';
 import { create as promoCreate } from '@/routes/promo';
 import type { NavItem } from '@/types';
 
@@ -35,6 +37,11 @@ const mainNavItems = computed<NavItem[]>(() => [
         title: 'Dashboard',
         href: dashboard(),
         icon: LayoutGrid,
+    },
+    {
+        title: 'Mes fédérations',
+        href: federationsIndex(),
+        icon: Trophy,
     },
     {
         title: 'Atelier promo',
