@@ -21,5 +21,7 @@ class DatabaseSeeder extends Seeder
             'name' => 'TestUser',
             'email' => 'test@example.com',
         ]);
+
+        $this->call(DemoFederationSeeder::class);
     }
 }
